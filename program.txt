@@ -1,0 +1,55 @@
+inicio
+
+sarta chaine;
+entero i;
+entero a;
+entero b;
+float fl;
+tablero table;
+
+i<-0;
+a<-5;
+table <- [0,10];
+
+por i en table
+ darse
+    i<-i+1;
+    b<- i*a-5;
+
+ finitopor
+
+si i gt 10 ento
+  i<-5;
+contrario
+  i<-0;
+finitosi
+
+!! initialisation de la chaine
+
+cambiar (b)
+caso 1 *
+chaine <-"1";
+caso 2 *
+chaine <-"2";
+
+defecto *
+chaine <-"else";
+finitocambiar
+
+Leer(fl);
+
+tanto (chaine eq "finito" AND NAY a le -8 ) darse
+fl<-fl/2+5;
+chaine DD 2 ;
+finitotanto
+
+escrir(ft);
+
+**
+Ceci est un commentaire
+écrit sur plusieurs lignes
+**
+
+
+finito
+
