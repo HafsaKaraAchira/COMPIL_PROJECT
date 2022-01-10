@@ -1,3 +1,4 @@
+1+1
 inicio
 
 sarta chaine;
@@ -16,7 +17,7 @@ por i en table
     i<-i+1;
     b<- i*a-5;
 
- finitopor
+finitopor
 
 si i gt 10 ento
   i<-5;

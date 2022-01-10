@@ -1,0 +1,6 @@
+cd .
+clear
+flex analyzer_lex.l
+bison -d analyzer_syn.y
+gcc -o analyzer lex.yy.c analyzer_syn.tab.c -lm
+./analyzer test.txt
