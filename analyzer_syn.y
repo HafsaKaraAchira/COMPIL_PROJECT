@@ -27,16 +27,22 @@ extern FILE *yyin ;
 
 
 
-/*
-%type<texte>            E
-%type<texte>            expressionBooleenne
-%type<texte>            variableBooleenne
-*/
+/**/
+%type<texte>            script
+/**/
 %type<texte>            code
+
 %type<texte>            instruction
 %type<texte>            affectation
+%type<texte>            declaration
+%type<texte>            expression
+
+%type<texte>            identificateur
 %type<texte>            variable
-%type<texte>            variableArithmetique
+%type<texte>            constant
+%type<texte>            constantArithmetique
+%type<texte>            constantChaine
+
 %type<texte>            expressionArithmetique
 %type<texte>            addition
 %type<texte>            soustraction
@@ -44,42 +50,65 @@ extern FILE *yyin ;
 %type<texte>            division
 %type<texte>            puissance
 
+/**/
+%type<texte>            expressionBooleenne
+
+%type<texte>            boucle_si
+%type<texte>            boucle_si_sinon
+%type<texte>            boucle_for
+%type<texte>            boucle_tant_que
+/**/
 
 
 /* Nous avons la liste de nos tokens (les terminaux de notre grammaire) */
-    
-%token               TOK_VRAI        /*true*/
-%token               TOK_FAUX        /*false*/
+
 %token               TOK_TYPE        /*type*/
 %token<texte>        TOK_NOMBRE      /*nombre*/
 %token<texte>        TOK_STR         /*variable*/
 %token<texte>        TOK_VAR         /*variable*/
-%token<texte>        TOK_VARB        /*variable*/
 %token               TOK_AFFECT      /*<-*/
 %token               TOK_FINSTR      /*;*/
 %token               TOK_OUVR        /*< { [*/        
 %token               TOK_FERM        /*> } ]*/
 %token               TOK_PONC        /*, | :*/
 
-%token         TOK_FINF        /*FINITO__INITIO*/
-%token         TOK_FINB       /*FINITOPO__finittosi__finitocambiar*/
+%token               TOK_FINI        /*INITIO*/
+%token               TOK_FINF        /*FINITO*/
+%token               TOK_FINB        /*FINITOPOR__finittosi__finitocambiar*/
 
-%token  TOK_SI         /*si*/
-%token  TOK_ENTO       /*alors*/
-%token  TOK_SINON      /*sinon*/
-%token  TOK_CAMBIAR    /*switch*/
-%token  TOK_CASE       /*case__defecto*/
+%token               TOK_SI          /*si*/
+%token               TOK_ALORS        /*alors*/
+%token               TOK_SINON       /*sinon*/
+%token               TOK_FINSI
+%token               TOK_CAMBIAR     /*switch*/
+%token               TOK_CASE        /*case__defecto*/
 
-%token  TOK_POR       /*case__defecto*/
-%token  TOK_EN       /*case__defecto*/
-%token  TOK_DARSE       /*case__defecto*/
-%token  TOK_TANTQUE       /*case__defecto*/
+%token               TOK_FOR         /*FOR*/
+%token               TOK_DANS        /*DANS*/
+%token               TOK_FAIRE       /*case__defecto*/
+%token               TOK_FINFOR
 
-%token  TOK_LEER                   /*Lecture*/
-%token  TOK_ESCRIR                 /*Ecriture*/
+%token               TOK_TANT     /*case__defecto*/
+%token               TOK_FINT
+
+
+%token               TOK_LEER        /*Lecture*/
+%token               TOK_ESCRIR      /*Ecriture*/
 
 
 %%
+
+
+script:
+       %empty{}
+       |
+       TOK_FINI TOK_FINF{
+              printf("Script vide , Rien a faire \n\n"); 
+       }
+       |
+       TOK_FINI code TOK_FINF{
+              printf("Fin du script\n\n"); 
+       };
 
 
 code:  %empty{}
@@ -93,42 +122,75 @@ code:  %empty{}
               error_syntaxical=true;
        };
 
-instruction:  affectation{
+instruction:  
+              declaration{
+              }
+              |
+              affectation{
+              }            
+              |
+              boucle_for{
+              }
+              |
+              boucle_si{
+              }
+              boucle_si_sinon{
+              }
+              |
+              boucle_tant_que{
+              }             
+              ;
+
+declaration:  TOK_TYPE identificateur TOK_FINSTR{
+                     printf("\t\tDecalaration de la variable : %s\n",$2);
               };
 
-affectation:   variable TOK_AFFECT expressionArithmetique TOK_FINSTR{
-              printf("\t\t\tInstruction type Affectation : Affectation sur la variable %s\n",$1);
-       };
+affectation:  identificateur TOK_AFFECT expression TOK_FINSTR{
+                     printf("\t\tInstruction type Affectation : Affectation sur la variable %s\n",$1);
+              };
 
+expression:   expressionArithmetique{
+       	}
+       	|
+              expressionBooleenne{
+              };
+
+variable:     identificateur{
+              }
+              |
+              constant{
+              }              
  
-variable:     variableArithmetique{
+identificateur:     TOK_VAR{
+                     printf("\t\t\tVariable : %s\n",$1);
                      $$=strdup($1);
-              };       
+              }              
 
-variableArithmetique:  TOK_VAR{
-                                printf("\t\t\tVariable arithmetique : %s\n",$1);
-                                $$=strdup($1);
-                     }
-                     |
+constant:     constantArithmetique{
+                     $$=strdup($1);
+              }
+              |
+              constantChaine{
+                     $$=strdup($1);
+              }
+              ;       
+
+constantArithmetique:  
                      TOK_NOMBRE{
-                            printf("\t\t\tconstant arithmetique : %s\n",$1);
+                            printf("\t\t\tConstant arithmetique : %s\n",$1);
                             $$=strdup($1);
                      };
 
-/*
-variable_arithmetique:  
-                     |
-                     TOK_VAR{
-                            //sprintf(a, "%ld", $1);
-                            printf("\t\t\tVariable arithmetique %s\n",$1);
-                            $$=strdup($1);
-                           // free(a);
-                     };
-*/
+constantChaine:   
+              TOK_STR{
+                     printf("\t\t\tConstant Chaines : %s\n",$1);
+                     $$=strdup($1);
+              };                     
+
  
 
 expressionArithmetique: 
-       variableArithmetique{
+       constantArithmetique{
        }
        |
        addition{
@@ -146,15 +208,15 @@ expressionArithmetique:
        puissance{
        }
 
-addition:            expressionArithmetique TOK_PLUS expressionArithmetique{      
-                            printf("\t\t\tAddition %s\n",buff);
-                            $$=strcat(strcat(strdup($1),strdup("+")),strdup($3));
-                     };
+addition:     expressionArithmetique TOK_PLUS expressionArithmetique{      
+                     printf("\t\t\tAddition %s\n",buff);
+                     $$=strcat(strcat(strdup($1),strdup("+")),strdup($3));
+              };
 
-soustraction:        expressionArithmetique TOK_MOINS expressionArithmetique{
-                            printf("\t\t\tSoustraction %s\n",buff);
-                            $$=strcat(strcat(strdup($1),strdup("-")),strdup($3));
-                     };
+soustraction: expressionArithmetique TOK_MOINS expressionArithmetique{
+                     printf("\t\t\tSoustraction %s\n",buff);
+                     $$=strcat(strcat(strdup($1),strdup("-")),strdup($3));
+              };
 
 multiplication:      expressionArithmetique TOK_MUL expressionArithmetique{
                             buff = strcat(strcat(strdup($1),strdup("*")),strdup($3));
@@ -162,15 +224,60 @@ multiplication:      expressionArithmetique TOK_MUL expressionArithmetique{
                             $$= strdup(buff);
                      };
 
-division:            expressionArithmetique TOK_DIV expressionArithmetique{
-                            printf("\t\t\tDivision %s\n",buff);
-                            $$=strcat(strcat(strdup($1),strdup("/")),strdup($3));
+division:     expressionArithmetique TOK_DIV expressionArithmetique{
+                     printf("\t\t\tDivision %s\n",buff);
+                     $$=strcat(strcat(strdup($1),strdup("/")),strdup($3));
+              };
+
+puissance:    expressionArithmetique TOK_PUISS expressionArithmetique{
+                     printf("\t\t\tPuissance %s\n",buff);
+                     $$=strcat(strcat(strdup($1),strdup("^")),strdup($3));
+              };
+
+/**/
+
+expressionBooleenne:       
+                     variable{
+                            $$=strdup($1);
+                     }
+                     |
+                     TOK_NON expressionBooleenne{
+                            printf("\t\t\tOperation booleenne NON\n");
+                            $$=strcat(strdup("non "), strndup($2,sizeof(char)*strlen($2)));
+                     }
+                     |
+                     expressionBooleenne TOK_ET expressionBooleenne{
+                            printf("\t\t\tOperation booleenne ET\n");
+                            $$=strcat(strcat(strdup($1),strdup(" et ")),strdup($3));
+                     }
+                     |
+                     expressionBooleenne TOK_OU expressionBooleenne{
+                            printf("\t\t\tOperation booleenne OU\n");
+                            $$=strcat(strcat(strdup($1),strdup(" ou ")),strdup($3));
+                     }
+                     |
+                     TOK_PARG expressionBooleenne TOK_PARD{
+                            printf("\t\t\texpression booleenne entre parentheses\n");
+                            $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
                      };
 
-puissance:           expressionArithmetique TOK_PUISS expressionArithmetique{
-                            printf("\t\t\tPuissance %s\n",buff);
-                            $$=strcat(strcat(strdup($1),strdup("^")),strdup($3));
-                     };
+boucle_si:    TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI{
+                     printf("\t\t\tBLock SI\n");
+              };
+
+boucle_si_sinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI{
+                     printf("\t\t\tBLock SI-SINON\n");
+              };
+
+boucle_for:   TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR{
+                     printf("\t\t\tBLock POUR\n");
+              };
+
+boucle_tant_que:  TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT{
+                        printf("\t\t\tBLock TANTQUE\n");
+              };                     
+
+/**/
 
 %%
 
@@ -181,10 +288,7 @@ int main(int argc, char *argv[]){
  	yyin = fopen(argv[1],"r");
 
        printf("Debut de analyse syntaxique :\n");
-       /*char buff[255];
-       fgets(buff, 255, yyin);
-       printf("1 : %s\n", buff );*/
-       
+
        yyparse();
 
        printf("Fin de lanalyse !\n");
