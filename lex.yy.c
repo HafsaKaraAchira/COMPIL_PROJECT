@@ -1514,7 +1514,7 @@ case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
 #line 135 "analyzer_lex.l"
-{printf("COMMENTAIRE:\n%s\n",yytext); yy_pop_state(); }
+{/*printf("COMMENTAIRE:\n%s\n",yytext);*/ yy_pop_state(); }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */

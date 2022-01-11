@@ -131,7 +131,7 @@ identificateur {lettre}({lettre}|{nombre})*
  /****************************************** commentaires ******************************************/
 
 "**" 						{yy_push_state(comment); yymore();}
-<comment>[^"**"]*("**") 	{printf("COMMENTAIRE:\n%s\n",yytext); yy_pop_state(); }
+<comment>[^"**"]*("**") 	{/*printf("COMMENTAIRE:\n%s\n",yytext);*/ yy_pop_state(); }
 <comment>[^"**"]*[^"**"] 	{send_error(yytext,yylineno);}
 !!							{yy_push_state(inlin_comm); yymore();}
 <inlin_comm>.*				{yy_pop_state(); }

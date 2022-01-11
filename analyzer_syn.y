@@ -27,9 +27,9 @@ extern FILE *yyin ;
 
 
 
-/**/
+/*
 %type<texte>            script
-/**/
+*/
 %type<texte>            code
 
 %type<texte>            instruction
@@ -98,7 +98,7 @@ extern FILE *yyin ;
 
 %%
 
-
+/*
 script:
        %empty{}
        |
@@ -109,6 +109,7 @@ script:
        TOK_FINI code TOK_FINF{
               printf("Fin du script\n\n"); 
        };
+*/
 
 
 code:  %empty{}

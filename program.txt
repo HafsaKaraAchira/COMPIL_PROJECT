@@ -1,5 +1,4 @@
-1+1
-inicio
+!!initio
 
 sarta chaine;
 entero i;
@@ -51,6 +50,5 @@ Ceci est un commentaire
 écrit sur plusieurs lignes
 **
 
-
-finito
+!!finito
 

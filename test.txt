@@ -1,4 +1,1 @@
-initio
-    sarta a ;
-    a <- "chaine" ;
-finito    
+   
