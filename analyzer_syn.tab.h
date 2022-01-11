@@ -49,45 +49,52 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    TOK_COMP = 258,
-    TOK_DECAL = 259,
-    TOK_MOD = 260,
-    TOK_PLUS = 261,
-    TOK_MOINS = 262,
-    TOK_MUL = 263,
-    TOK_DIV = 264,
-    TOK_PUISS = 265,
-    TOK_OU = 266,
-    TOK_ET = 267,
-    TOK_NON = 268,
-    TOK_PARG = 269,
-    TOK_PARD = 270,
-    TOK_TYPE = 271,
-    TOK_NOMBRE = 272,
-    TOK_STR = 273,
-    TOK_VAR = 274,
-    TOK_AFFECT = 275,
-    TOK_FINSTR = 276,
+    TOK_DECAL = 258,
+    TOK_MOD = 259,
+    TOK_PLUS = 260,
+    TOK_MOINS = 261,
+    TOK_MUL = 262,
+    TOK_DIV = 263,
+    TOK_PUISS = 264,
+    TOK_OU = 265,
+    TOK_ET = 266,
+    TOK_NON = 267,
+    TOK_COMP = 268,
+    NEG = 269,
+    TOK_PARG = 270,
+    TOK_PARD = 271,
+    TOK_TYPE = 272,
+    TOK_NOMBRE = 273,
+    TOK_STR = 274,
+    TOK_VAR = 275,
+    TOK_AFFECT = 276,
     TOK_OUVR = 277,
     TOK_FERM = 278,
-    TOK_PONC = 279,
-    TOK_FINI = 280,
-    TOK_FINF = 281,
-    TOK_FINB = 282,
-    TOK_SI = 283,
-    TOK_ALORS = 284,
-    TOK_SINON = 285,
-    TOK_FINSI = 286,
-    TOK_CAMBIAR = 287,
-    TOK_CASE = 288,
-    TOK_FOR = 289,
-    TOK_DANS = 290,
-    TOK_FAIRE = 291,
-    TOK_FINFOR = 292,
-    TOK_TANT = 293,
-    TOK_FINT = 294,
-    TOK_LEER = 295,
-    TOK_ESCRIR = 296
+    TOK_BRACKG = 279,
+    TOK_BRACKD = 280,
+    TOK_ACCOLG = 281,
+    TOK_ACCOLD = 282,
+    TOK_VIRG = 283,
+    TOK_DPTS = 284,
+    TOK_PIPE = 285,
+    TOK_FINSTR = 286,
+    TOK_FINI = 287,
+    TOK_FINF = 288,
+    TOK_FINB = 289,
+    TOK_SI = 290,
+    TOK_ALORS = 291,
+    TOK_SINON = 292,
+    TOK_FINSI = 293,
+    TOK_CAMBIAR = 294,
+    TOK_CASE = 295,
+    TOK_FOR = 296,
+    TOK_DANS = 297,
+    TOK_FAIRE = 298,
+    TOK_FINFOR = 299,
+    TOK_TANT = 300,
+    TOK_FINT = 301,
+    TOK_LEER = 302,
+    TOK_ESCRIR = 303
   };
 #endif
 
@@ -95,12 +102,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 11 "analyzer_syn.y"
+#line 10 "analyzer_syn.y"
 
        long nombre;
        char* texte;
 
-#line 104 "analyzer_syn.tab.h"
+#line 111 "analyzer_syn.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -11,8 +11,7 @@ i<-0;
 a<-5;
 table <- [0,10];
 
-por i en table
- darse
+por i en table darse
     i<-i+1;
     b<- i*a-5;
 
@@ -26,6 +25,7 @@ finitosi
 
 !! initialisation de la chaine
 
+**
 cambiar (b)
 caso 1 *
 chaine <-"1";
@@ -35,10 +35,12 @@ chaine <-"2";
 defecto *
 chaine <-"else";
 finitocambiar
+**
 
 Leer(fl);
 
-tanto (chaine eq "finito" AND NAY a le -8 ) darse
+** chaine eq "finito" AND NAY a  le -8 **
+tanto ( chaine eq "finito" AND NAY a  le -8 ) darse
 fl<-fl/2+5;
 chaine DD 2 ;
 finitotanto

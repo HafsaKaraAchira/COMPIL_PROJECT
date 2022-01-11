@@ -1,1 +1,12 @@
-   
+**
+a <- chaine eq "finito" ;
+b <- a le 8 ;
+c <- NAY b ;
+d <- a AND c ;
+**
+**
+e <- chaine eq "finito" AND NAY a le 8 ;
+f <- chaine eq "finito" AND NAY a le -8 ;
+**
+f <- chaine eq "finito" AND NAY a le -8 ;
+

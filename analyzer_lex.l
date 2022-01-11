@@ -80,8 +80,8 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** E/S ******************************************/
 
-(?i:"leer")/"("{blanc}*{identificateur}   {return TOK_LEER ;}
-(?i:"escrir")/"("{blanc}*{identificateur} {return TOK_ESCRIR ;}
+(?i:"leer")/{blanc}*"("{blanc}*{identificateur}    {return TOK_LEER ;}
+(?i:"escrir")/{blanc}*"("{blanc}*{identificateur}  {return TOK_ESCRIR ;}
 
  /****************************************** operateurs arithmetiques ******************************************/
 
@@ -119,10 +119,20 @@ identificateur {lettre}({lettre}|{nombre})*
 
 "(" 	{return TOK_PARG ;}
 ")" 	{return TOK_PARD ;}
-"{"|"["|"<" 	{return TOK_OUVR ;}
-"}"|"]"|">" 	{return TOK_FERM ;}
-","|"|"|":" 		{return TOK_PONC ;}
-";" 				{return TOK_FINSTR ;}
+
+"{" 	{return TOK_ACCOLG ;}
+"[" 	{return TOK_BRACKG ;}
+"<" 	{return TOK_OUVR ;}
+
+"}" 	{return TOK_ACCOLD ;}
+"]" 	{return TOK_BRACKD ;}
+">" 	{return TOK_FERM ;}
+
+"," 	{return TOK_VIRG ;}
+"|" 	{return TOK_PIPE ;}
+":" 	{return TOK_DPTS ;}
+
+";" 	{return TOK_FINSTR ;}
 
  /****************************************** identificateurs ******************************************/
 
