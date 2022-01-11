@@ -172,43 +172,6 @@ puissance:           expressionArithmetique TOK_PUISS expressionArithmetique{
                             $$=strcat(strcat(strdup($1),strdup("^")),strdup($3));
                      };
 
- /*
-
-TOK_PARG expressionArithmetique TOK_PARD{
-                                        printf("\t\t\tC'est une expression artihmetique entre parentheses\n");
-                                        $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
-                                };{
-              printf("\nResult=%s\n", $$);
-              return 0;
-       };
-
- E:
-  TOK_VAR       {$$ = $1 ;}
-
- | TOK_NOMBRE   {printf("nombre = %ld\n",$1); sprintf( buff,"%ld",$1);  $$ = buff ;}
- 
- | E TOK_PLUS E { sprintf( buff,"%ld",atol($1)+atol($3));   $$ = buff ;}
- 
- |E TOK_MOINS E { sprintf( buff,"%ld",atol($1)+atol($3));  $$ = buff ;}
-  
- |E TOK_MUL E   { sprintf( buff,"%ld",atol($1)*atol($3));  $$ = buff ;}
-  
- |E TOK_DIV E   { sprintf( buff,"%ld",atol($1)/atol($3));  $$ = buff ;}
-  
- |E TOK_MOD E   { sprintf( buff,"%ld",atol($1)/atol($3));  $$ = buff ;}
-
- |E TOK_PUISS E {    printf("puiss = %ld\n",atol($1) );
-                     printf("puiss2 = %ld\n",atol($3) );
-                     sprintf( buff,"%f", pow(atof($1),atof($3)) );  
-                     $$ = buff ;
-              }
-
- |TOK_PARG E TOK_PARD {$$=$2;}
-
-  
- ;  
-*/
-
 %%
 
 /********************************************/
