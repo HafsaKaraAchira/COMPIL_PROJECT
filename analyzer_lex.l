@@ -111,9 +111,9 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** constants ******************************************/
 
-{entier} {yylval.nombre=atoi(yytext);	return TOK_NOMBRE;}
+{entier} {yylval.texte = yytext;	return TOK_NOMBRE;}
 
-{string} {yylval.texte = yytext; return TOK_STR ;}
+{string} {yylval.texte = yytext;	return TOK_STR ;}
 
  /****************************************** ponctuation ******************************************/	
  /*{reel} {yylval.decimal=atof(yytext);	return TOK_NOMBRE;}*/
