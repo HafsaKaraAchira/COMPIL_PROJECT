@@ -1,6 +1,6 @@
 cd .
 clear
 flex analyzer_lex.l
-bison -d analyzer_syn.y
+bison -d -v analyzer_syn.y
 gcc lex.yy.c analyzer_syn.tab.c -lm
-./a.out program.txt
+./a.out test.txt

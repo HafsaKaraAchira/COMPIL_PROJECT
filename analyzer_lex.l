@@ -49,8 +49,8 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** block_fonctions ******************************************/
  
-(?i:"inicio") { return TOK_FINI ; }
-(?i:"finito") { return TOK_FINF ; }
+(?i:"inicio")/{separateur}+ { return TOK_FINI ; }
+(?i:"finito")/{separateur}+ { return TOK_FINF ; }
 
  /****************************************** types ******************************************/
 
@@ -104,7 +104,12 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** operateurs comparaison ******************************************/
 
-(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge")/{blanc} {return TOK_COMP ;}
+(?i:"eq")/{blanc} {return TOK_EQ ;}
+(?i:"nq")/{blanc} {return TOK_NQ ;}
+(?i:"lt")/{blanc} {return TOK_LT ;}
+(?i:"gt")/{blanc} {return TOK_GT ;}
+(?i:"le")/{blanc} {return TOK_LE ;}
+(?i:"ge")/{blanc} {return TOK_GE ;}
 
  /****************************************** operateurs decalage ******************************************/
 
@@ -140,10 +145,10 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** commentaires ******************************************/
 
-"**" 						{yy_push_state(comment); yymore();}
-<comment>[^"**"]*("**") 	{/*printf("COMMENTAIRE:\n%s\n",yytext);*/ yy_pop_state(); }
+"**" 						{yy_push_state(comment);}
+<comment>[^"**"]*("**") 	{yy_pop_state(); }
 <comment>[^"**"]*[^"**"] 	{send_error(yytext,yylineno);}
-!!							{yy_push_state(inlin_comm); yymore();}
+!!							{yy_push_state(inlin_comm);}
 <inlin_comm>.*				{yy_pop_state(); }
 
  /****************************************** blanks ******************************************/
@@ -165,17 +170,7 @@ identificateur {lettre}({lettre}|{nombre})*
 /****************************************** Code Section ******************************************/
 
 char * send_error(char *error ,int line){
-	//fprintf(stderr,"%s <line:%d>",error,yylineno);
 	error_lexical=true ;
 	return error ;
 }
 
-/*int main(){
-	
- 
-	BEGIN(INITIAL);
-	yylex();
-
-	return 0;
-}
-*/

@@ -20,16 +20,19 @@ extern FILE *yyin ;
 %left         TOK_OU          		    /*ou */
 %left         TOK_ET                          /*et*/
 %left         TOK_NON                         /*nay*/
-%left         TOK_COMP                        /*eq__nq__lt__gt__le__ge*/
+%left         TOK_EQ                          /*eq*/
+%left         TOK_NQ                          /*nq*/
+%left         TOK_LT                          /*lt*/
+%left         TOK_GT                          /*gt*/
+%left         TOK_LE                          /*le*/
+%left         TOK_GE                          /*ge*/
 %precedence NEG
 %right        TOK_PARG        TOK_PARD        /* ( ) */
 
 
 
-
-/*
 %type<texte>            script
-*/
+
 %type<texte>            code
 
 %type<texte>            instruction
@@ -56,7 +59,6 @@ extern FILE *yyin ;
 %type<texte>            division
 %type<texte>            puissance
 
-/**/
 %type<texte>            expressionBooleenne
 %type<texte>            comparaison
 
@@ -67,7 +69,7 @@ extern FILE *yyin ;
 
 %type<texte>            bouclePour
 %type<texte>            boucleTantQue
-/**/
+
 
 
 /* Nous avons la liste de nos tokens (les terminaux de notre grammaire) */
@@ -112,24 +114,18 @@ extern FILE *yyin ;
 %token               TOK_LEER        /*Lecture*/
 %token               TOK_ESCRIR      /*Ecriture*/
 
-
 %%
 
-/*
+
+
 script:
-       %empty{}
-       |
-       TOK_FINI TOK_FINF{
-              printf("Script vide , Rien a faire \n\n"); 
-       }
-       |
        TOK_FINI code TOK_FINF{
-              printf("Fin du script\n\n"); 
+              printf("==========================================Fin du script\n\n"); 
        };
-*/
 
 
-code:  %empty{}
+code:  %empty{};
+
        |
        code instruction{
               printf("\n------------------------------------- Instruction valide ! --------------------------------------\n\n");
@@ -302,8 +298,6 @@ puissance:    expressionArithmetique TOK_PUISS expressionArithmetique{
                      printf("\t\tPuissance %s",$$);
               };
 
-/**/
-
 expressionBooleenne:       
                      variable{
                             $$=strdup($1);
@@ -314,12 +308,12 @@ expressionBooleenne:
                      }
                      |
                      TOK_NON expressionBooleenne{
-                            $$=strcat( strdup("non "), strndup($2,sizeof(char)*strlen($2)) );
+                            $$=strncat( strdup("non "), strdup($2), sizeof $2 + 5 );
                             printf("\t\tOperation booleenne : %s \n",$$);
                      }
                      |
                      expressionBooleenne TOK_ET expressionBooleenne{
-                            $$=strcat(strcat(strdup($1),strdup(" et ")),strdup($3));
+                            $$=strncat(strcat(strdup($1),strdup(" et ")),strdup($3) , sizeof $3 + sizeof $1 + sizeof " et ");
                             printf("\t\tOperation booleenne : %s \n",$$);
                      }
                      |
@@ -334,8 +328,33 @@ expressionBooleenne:
                      }
                      ;
 
-comparaison:  expression TOK_COMP expression{
-                     $$=strcat(strcat(strdup($1),strdup(" COMP ")),strdup($3));
+comparaison:  expression TOK_EQ expression{
+                     $$=strcat(strcat(strdup($1),strdup(" == ")),strdup($3));
+                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+              }
+              |
+              expression TOK_NQ expression{
+                     $$=strcat(strcat(strdup($1),strdup(" != ")),strdup($3));
+                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+              }
+              |
+              expression TOK_LT expression{
+                     $$=strcat(strcat(strdup($1),strdup(" < ")),strdup($3));
+                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+              }
+              |
+              expression TOK_GT expression{
+                     $$=strcat(strcat(strdup($1),strdup(" > ")),strdup($3));
+                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+              }
+              |
+              expression TOK_LE expression{
+                     $$=strcat(strcat(strdup($1),strdup(" <= ")),strdup($3));
+                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+              }
+              |
+              expression TOK_GE expression{
+                     $$=strcat(strcat(strdup($1),strdup(" >= ")),strdup($3));
                      printf("\n\t\tComparaison : %s comp %s",$1,$3);
               }
               ;                     
@@ -363,7 +382,6 @@ boucleTantQue:  TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT{
                         printf("\tBLock TANTQUE");
               };                     
 
-/**/
 
 %%
 

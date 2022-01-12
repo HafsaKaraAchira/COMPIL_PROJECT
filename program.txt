@@ -40,7 +40,8 @@ finitocambiar
 Leer(fl);
 
 ** chaine eq "finito" AND NAY a  le -8 **
-tanto ( chaine eq "finito" AND NAY a  le -8 ) darse
+
+tanto ( (chaine eq "finito") AND NAY a le -8) darse
 fl<-fl/2+5;
 chaine DD 2 ;
 finitotanto
