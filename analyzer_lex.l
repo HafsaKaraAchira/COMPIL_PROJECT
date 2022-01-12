@@ -31,6 +31,7 @@ identificateur {lettre}({lettre}|{nombre})*
 %x inlin_comm
 %x string
 
+%s boolean
 %s block
 %s if_block
 %s if_else
@@ -45,7 +46,8 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** Strings ******************************************/
 \"				 		{yy_push_state(string); yymore();}
-<string>[^\"]*\" 		{ yy_pop_state(); yylval.texte = yytext; return TOK_STR;}
+<string>[^\"]*\" 		{ yy_pop_state(); yylval.texte = yytext; if(yy_top_state() == if_else || yy_top_state() == while_block ){ return TOK_STR; }else{return TOK_VARB;} }
+
 
  /****************************************** block_fonctions ******************************************/
  
@@ -58,8 +60,8 @@ identificateur {lettre}({lettre}|{nombre})*
  
  /****************************************** conditions ******************************************/
 
-(?i:"si")							{yy_push_state(if_block); return TOK_SI ; }
-<if_block>(?i:"ento") 				{return TOK_ALORS ; }
+(?i:"si")							{yy_push_state(if_block); yy_push_state(boolean); return TOK_SI ; }
+<boolean>(?i:"ento") 				{yy_pop_state(); return TOK_ALORS ; }
 <if_block>(?i:"contrario")  		{return TOK_SINON ;}
 <if_block,if_else>(?i:"finitosi")	{yy_pop_state(); return TOK_FINSI ; }
 
@@ -69,13 +71,13 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** boucles ******************************************/
 
-(?i:"por")							{yy_push_state(for_block); return TOK_FOR ;}
+(?i:"por")							{ yy_push_state(for_block); return TOK_FOR ;}
 <for_block>(?i:"en") 			 	{return TOK_DANS ;}
 <for_block>(?i:"darse") 		 	{return TOK_FAIRE ;}
 <for_block>(?i:"finitopor") 		{yy_pop_state(); return TOK_FINFOR ;}
 
-(?i:"tanto") 						{yy_push_state(while_block); return TOK_TANT ;}
-<while_block>(?i:"darse")       	{return TOK_FAIRE ;}
+(?i:"tanto") 						{yy_push_state(while_block); yy_push_state(boolean); return TOK_TANT ;}
+<boolean>(?i:"darse")       		{return TOK_FAIRE ;}
 <while_block>(?i:"finitotanto") 	{yy_pop_state(); return TOK_FINT ;}
 
  /****************************************** E/S ******************************************/
@@ -94,7 +96,7 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** operateurs logiques ******************************************/
 
-(?i:"NAY") 	{return TOK_NON ;}
+(?i:"NAY") 	{if(yy_top_state() != if_else && yy_top_state() != while_block){yy_push_state(boolean);} return TOK_NON ;}
 (?i:"AND") 	{return TOK_ET ;}
 (?i:"OR") 	{return TOK_OU ;}
 
@@ -104,12 +106,12 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** operateurs comparaison ******************************************/
 
-(?i:"eq")/{blanc} {return TOK_EQ ;}
-(?i:"nq")/{blanc} {return TOK_NQ ;}
-(?i:"lt")/{blanc} {return TOK_LT ;}
-(?i:"gt")/{blanc} {return TOK_GT ;}
-(?i:"le")/{blanc} {return TOK_LE ;}
-(?i:"ge")/{blanc} {return TOK_GE ;}
+(?i:"eq")/{blanc}+ {return TOK_EQ ;}
+(?i:"nq")/{blanc}+ {return TOK_NQ ;}
+(?i:"lt")/{blanc}+ {return TOK_LT ;}
+(?i:"gt")/{blanc}+ {return TOK_GT ;}
+(?i:"le")/{blanc}+ {return TOK_LE ;}
+(?i:"ge")/{blanc}+ {return TOK_GE ;}
 
  /****************************************** operateurs decalage ******************************************/
 
@@ -117,7 +119,9 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** constants ******************************************/
 
-{entier} {yylval.texte = yytext;	return TOK_NOMBRE;}
+{entier} {yylval.texte = yytext; 
+			if(YYSTATE == boolean){ return TOK_VARB; }else{return TOK_NOMBRE;}
+		 }
 
  /****************************************** ponctuation ******************************************/	
  /*{reel} {yylval.decimal=atof(yytext);	return TOK_NOMBRE;}*/
@@ -137,11 +141,21 @@ identificateur {lettre}({lettre}|{nombre})*
 "|" 	{return TOK_PIPE ;}
 ":" 	{return TOK_DPTS ;}
 
-";" 	{return TOK_FINSTR ;}
+";" 	{if(YY_START == boolean){ yy_pop_state(); } return TOK_FINSTR ;}
 
  /****************************************** identificateurs ******************************************/
 
-{identificateur} {yylval.texte = yytext; return TOK_VAR ;}
+{identificateur} {	yylval.texte = yytext; 
+					
+					return (YY_START == boolean?TOK_VARB:TOK_VAR) ;
+				}
+	/*
+	printf(" state = %d",YY_START == boolean);
+	if(YY_START == boolean){ return TOK_VAR; }else{return TOK_VARB;}
+{identificateur}/{blanc}*(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") {yy_push_state(boolean); yylval.texte = yytext; return TOK_VARB ;}
+	*/
+
+
 
  /****************************************** commentaires ******************************************/
 
@@ -163,7 +177,7 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** EOF ******************************************/
 
-<<EOF>> {return 0;}
+<<EOF>>  { return 0; }
 
 %%
 

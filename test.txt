@@ -1,12 +1,7 @@
-**
-a <- chaine eq "finito" ;
-b <- a le 8 ;
-c <- NAY b ;
-d <- a AND c ;
-e <- chaine eq "finito" AND NAY a le 8 ;
-f <- chaine eq "finito" AND NAY a le -8 ;
-**
-
 inicio
-f <- (chaine eq "finito") AND NAY a le -8 ;
+
+si i gt 10 ento
+  i<-5;
+finitosi
+
 finito
