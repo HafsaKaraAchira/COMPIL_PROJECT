@@ -1,10 +1,10 @@
 %{
 #include "analyzer.h"
 bool error_syntaxical=false;
-extern unsigned int lineno;
 extern bool error_lexical;
 char *buff;
 extern FILE *yyin ;
+extern FILE *yyout ;
 %}
 
 %union {
@@ -26,8 +26,8 @@ extern FILE *yyin ;
 %left         TOK_GT                          /*gt*/
 %left         TOK_LE                          /*le*/
 %left         TOK_GE                          /*ge*/
-%precedence NEG
 %right        TOK_PARG        TOK_PARD        /* ( ) */
+%precedence NEG
 
 
 %type<texte>            script
@@ -65,6 +65,11 @@ extern FILE *yyin ;
 %type<texte>            comparaison
 %type<texte>            boucleSi
 %type<texte>            boucleSiSinon
+%type<texte>            boucleSwitch
+%type<texte>            cases
+%type<texte>            defaultcase
+%type<texte>            case
+
 %type<texte>            bouclePour
 %type<texte>            boucleTantQue
 
@@ -91,14 +96,17 @@ extern FILE *yyin ;
 
 %token               TOK_FINI        /*INITIO*/
 %token               TOK_FINF        /*FINITO*/
-%token               TOK_FINB        /*FINITOPOR__finittosi__finitocambiar*/
 
 %token               TOK_SI          /*si*/
 %token               TOK_ALORS        /*alors*/
 %token               TOK_SINON       /*sinon*/
 %token               TOK_FINSI
-%token               TOK_CAMBIAR     /*switch*/
-%token               TOK_CASE        /*case__defecto*/
+
+%token               TOK_SWITCH         /*switch*/
+%token               TOK_CASE           /*case*/
+%token               TOK_DEFAULT        /*defecto*/
+%token               TOK_CASEDEF        /*case ... * */
+%token               TOK_FINSWITCH      /*finitocambiar*/
 
 %token               TOK_FOR         /*FOR*/
 %token               TOK_DANS        /*DANS*/
@@ -128,7 +136,7 @@ code:  %empty{};
        }
        |
        code error{
-              fprintf(stderr,"\t\t!!!!!!ERREUR : Erreur de syntaxe a la ligne %d.\n",lineno);
+              fprintf(stderr,"\t\t!!!!!!ERREUR : Erreur de syntaxe .\n");
               error_syntaxical=true;
        };
 
@@ -146,8 +154,10 @@ instruction:  declaration{}
               | 
               boucleSiSinon{}
               |
-              bouclePour{
-              }
+              boucleSwitch{}
+              |
+              bouclePour{}
+              |
               boucleTantQue{}
               ;
 
@@ -157,7 +167,8 @@ declaration:  TOK_TYPE identificateur TOK_FINSTR{
 
 affectation:  identificateur TOK_AFFECT expression TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur ( %s ) sur la variable ( %s )",$3,$1);
-              };
+              }
+              ;
 
 lecture:      TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR{
                      printf("\n\tInstruction type Lecture : lire dans la variable ( %s )",$3);
@@ -168,7 +179,7 @@ ecriture:     TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR{
               };
                                   
 operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR{
-                     printf("\t\tOperation binaire\n");
+                     printf("\n\t\tOperation binaire");
                      $$=strcat(strcat(strdup($1),strdup("DECAL")),strdup($3));
               };                            
 
@@ -216,6 +227,18 @@ element:variable{};
 expression:   expressionArithmetique{}             
        	|
               expressionBooleenne{}
+              |
+              constantChaine{}
+              |
+              TOK_PARG constantChaine TOK_PARD{
+                    $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
+              }
+              |
+              constantTableau{}
+              |
+              TOK_PARG constantTableau TOK_PARD{
+                    $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
+              }
               ;
 
 expressionArithmetique: 
@@ -234,6 +257,10 @@ expressionArithmetique:
        division{}
        |
        puissance{}
+       |
+       TOK_PARG expressionArithmetique TOK_PARD{
+              $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
+       }
        ;
 
 addition:     expressionArithmetique TOK_PLUS expressionArithmetique{      
@@ -246,7 +273,7 @@ soustraction: expressionArithmetique TOK_MOINS expressionArithmetique{
                      printf("\t\tSoustraction %s",$$);
               };
               
-inversionSigne:      TOK_MOINS expressionArithmetique %prec NEG {              
+inversionSigne:      TOK_MOINS expressionArithmetique %prec NEG{
                             $$=strcat(strdup("-"),strdup($2));
                             printf("\t\tInversion du signe %s",$$);
                      }
@@ -268,28 +295,28 @@ puissance:    expressionArithmetique TOK_PUISS expressionArithmetique{
               };                                  
        
 expressionBooleenne: TOK_VARB{
-                            $$=strdup($1);
+                            $$=strndup($1,2*strlen($1));
                             printf("\t\tVariable booleenne : %s",$$);
                      }                    
                      |                                                              
                      TOK_NON expressionBooleenne{
-                            $$=strcat(strdup("non "),strdup($2));
+                            $$=strncat(strdup("non "),strdup($2),2*strlen($2));
                             printf("\t\tOperation booleenne : %s \n",$$);
                      }                         
                      |
                      expressionBooleenne TOK_ET expressionBooleenne{
-                            $$=strcat(strcat(strdup($1),strdup(" et ")),strdup($3));
+                            $$=strncat(strcat(strdup($1),strdup(" et ")),strdup($3),2*strlen($1)+2*strlen($3));
                             printf("\t\tOperation booleenne : %s \n",$$);
                      }
                      |
                      expressionBooleenne TOK_OU expressionBooleenne{
-                            $$=strcat(strcat(strdup($1),strdup(" ou ")),strdup($3));
+                            $$=strncat(strcat(strdup($1),strdup(" ou ")),strdup($3),2*strlen($1)+2*strlen($3));
                             printf("\t\tOperation booleenne : %s \n",$$);
                      }                     
                      |
                      TOK_PARG expressionBooleenne TOK_PARD{
                             $$=strcat(strcat(strdup("("),strdup($2)),strdup(")"));
-                            printf("\t\tOperation booleenne : %s \n",$$);
+                            printf("\t\tOperation booleenne entre parenteses : %s \n",$$);
                      }                              
                      |
                      comparaison{
@@ -304,46 +331,69 @@ boucleSi:     TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI{
 
 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI{
                      printf("\tBLock SI_SINON");
-              };
-                             
+              }
+              ;
+
+boucleSwitch: TOK_SWITCH expression cases defaultcase TOK_FINSWITCH{
+                     printf("\tBLock SWITCH sur expression %s\n",$2);
+              }
+              ;
+
+cases:        case {}
+              |
+              case cases {}
+              ;
+
+case:         TOK_CASE constant TOK_CASEDEF code{
+                     printf("\tcas d evaluation == %s\n",$2);
+              }
+              ;              
+
+defaultcase:  TOK_DEFAULT TOK_CASEDEF code{
+                     printf("\tcas d evaluation par defaut\n");
+              };             
 
 bouclePour:   TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR{
                      printf("\tBLock POUR");
-              };
-
+              }
+              |
+              TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM  TOK_FAIRE code TOK_FINFOR{
+                     printf("\tBLock POUR");
+              }
+              ;
 
 boucleTantQue:  TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT{
-                        printf("\tBLock TANTQUE");
+                     printf("\tBLock TANTQUE");
               };               
                                  
 comparaison:  expressionBooleenne TOK_EQ expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" == ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s == %s",$1,$3);
               }
               |
               expressionBooleenne TOK_NQ expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" != ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s != %s",$1,$3);
               }
               |
               expressionBooleenne TOK_LT expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" < ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s < %s",$1,$3);
               }
               |
               expressionBooleenne TOK_GT expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" > ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s > %s",$1,$3);
               }
               |
               expressionBooleenne TOK_LE expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" <= ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s <= %s",$1,$3);
               }
               |
               expressionBooleenne TOK_GE expressionBooleenne{
                      $$=strcat(strcat(strdup($1),strdup(" >= ")),strdup($3));
-                     printf("\n\t\tComparaison : %s comp %s",$1,$3);
+                     printf("\n\t\tComparaison : %s >= %s",$1,$3);
               }
               ;             
 
@@ -353,7 +403,7 @@ comparaison:  expressionBooleenne TOK_EQ expressionBooleenne{
 
 
 int main(int argc, char *argv[]){
- 	yyin = fopen(argv[1],"r");
+ 	yyin = fopen(argv[1],"r");       
 
        printf("Debut de analyse syntaxique :\n\n");
 
@@ -378,5 +428,5 @@ int main(int argc, char *argv[]){
 }
 
 void yyerror(char *s) {
-       fprintf(stderr, "Erreur de syntaxe a la ligne %d: %s\n", lineno, s);
+       fprintf(stderr, "Erreur de syntaxe a la ligne __ : %s\n", s);
 }

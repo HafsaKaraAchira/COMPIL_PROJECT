@@ -1,4 +1,4 @@
-!!initio
+inicio
 
 sarta chaine;
 entero i;
@@ -20,12 +20,11 @@ finitopor
 si i gt 10 ento
   i<-5;
 contrario
-  i<-0;
+  i<--2;
 finitosi
 
 !! initialisation de la chaine
 
-**
 cambiar (b)
 caso 1 *
 chaine <-"1";
@@ -35,23 +34,21 @@ chaine <-"2";
 defecto *
 chaine <-"else";
 finitocambiar
-**
+
 
 Leer(fl);
 
-** chaine eq "finito" AND NAY a  le -8 **
-
-tanto ( (chaine eq "finito") AND NAY a le -8) darse
+tanto chaine eq "finito" ET fl darse
 fl<-fl/2+5;
 chaine DD 2 ;
 finitotanto
 
-escrir(ft);
+escrir (ft) ;
 
 **
 Ceci est un commentaire
 écrit sur plusieurs lignes
 **
 
-!!finito
+finito
 

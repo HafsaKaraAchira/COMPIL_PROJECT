@@ -1,15 +1,9 @@
 Terminals unused in grammar
 
     TOK_MOD
-    TOK_OUVR
-    TOK_FERM
     TOK_ACCOLG
     TOK_ACCOLD
-    TOK_DPTS
     TOK_PIPE
-    TOK_FINB
-    TOK_CAMBIAR
-    TOK_CASE
 
 
 Grammar
@@ -29,243 +23,268 @@ Grammar
     9            | operationBinaire
    10            | boucleSi
    11            | boucleSiSinon
+   12            | boucleSwitch
+   13            | bouclePour
+   14            | boucleTantQue
 
-   12 $@1: %empty
+   15 declaration: TOK_TYPE identificateur TOK_FINSTR
 
-   13 instruction: bouclePour $@1 boucleTantQue
+   16 affectation: identificateur TOK_AFFECT expression TOK_FINSTR
 
-   14 declaration: TOK_TYPE identificateur TOK_FINSTR
+   17 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
 
-   15 affectation: identificateur TOK_AFFECT expression TOK_FINSTR
+   18 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
 
-   16 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   19 operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR
 
-   17 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   20 variable: identificateur
+   21         | constant
 
-   18 operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   22 identificateur: TOK_VAR
 
-   19 variable: identificateur
-   20         | constant
+   23 constant: constantArithmetique
+   24         | constantChaine
+   25         | constantTableau
 
-   21 identificateur: TOK_VAR
+   26 constantArithmetique: TOK_NOMBRE
 
-   22 constant: constantArithmetique
-   23         | constantChaine
-   24         | constantTableau
+   27 constantChaine: TOK_STR
 
-   25 constantArithmetique: TOK_NOMBRE
+   28 constantTableau: TOK_BRACKG elements TOK_BRACKD
 
-   26 constantChaine: TOK_STR
+   29 elements: elements TOK_VIRG element
+   30         | element
 
-   27 constantTableau: TOK_BRACKG elements TOK_BRACKD
+   31 element: variable
 
-   28 elements: elements TOK_VIRG element
-   29         | element
+   32 expression: expressionArithmetique
+   33           | expressionBooleenne
+   34           | constantChaine
+   35           | TOK_PARG constantChaine TOK_PARD
+   36           | constantTableau
+   37           | TOK_PARG constantTableau TOK_PARD
 
-   30 element: variable
+   38 expressionArithmetique: identificateur
+   39                       | constantArithmetique
+   40                       | addition
+   41                       | soustraction
+   42                       | inversionSigne
+   43                       | multiplication
+   44                       | division
+   45                       | puissance
+   46                       | TOK_PARG expressionArithmetique TOK_PARD
 
-   31 expression: expressionArithmetique
-   32           | expressionBooleenne
+   47 addition: expressionArithmetique TOK_PLUS expressionArithmetique
 
-   33 expressionArithmetique: identificateur
-   34                       | constantArithmetique
-   35                       | addition
-   36                       | soustraction
-   37                       | inversionSigne
-   38                       | multiplication
-   39                       | division
-   40                       | puissance
+   48 soustraction: expressionArithmetique TOK_MOINS expressionArithmetique
 
-   41 addition: expressionArithmetique TOK_PLUS expressionArithmetique
+   49 inversionSigne: TOK_MOINS expressionArithmetique
 
-   42 soustraction: expressionArithmetique TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique TOK_MUL expressionArithmetique
 
-   43 inversionSigne: TOK_MOINS expressionArithmetique
+   51 division: expressionArithmetique TOK_DIV expressionArithmetique
 
-   44 multiplication: expressionArithmetique TOK_MUL expressionArithmetique
+   52 puissance: expressionArithmetique TOK_PUISS expressionArithmetique
 
-   45 division: expressionArithmetique TOK_DIV expressionArithmetique
+   53 expressionBooleenne: TOK_VARB
+   54                    | TOK_NON expressionBooleenne
+   55                    | expressionBooleenne TOK_ET expressionBooleenne
+   56                    | expressionBooleenne TOK_OU expressionBooleenne
+   57                    | TOK_PARG expressionBooleenne TOK_PARD
+   58                    | comparaison
 
-   46 puissance: expressionArithmetique TOK_PUISS expressionArithmetique
+   59 boucleSi: TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
 
-   47 expressionBooleenne: TOK_VARB
-   48                    | TOK_NON expressionBooleenne
-   49                    | expressionBooleenne TOK_ET expressionBooleenne
-   50                    | expressionBooleenne TOK_OU expressionBooleenne
-   51                    | TOK_PARG expressionBooleenne TOK_PARD
-   52                    | comparaison
+   60 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
 
-   53 boucleSi: TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   61 boucleSwitch: TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
 
-   54 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   62 cases: case
+   63      | case cases
 
-   55 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   64 case: TOK_CASE constant TOK_CASEDEF code
 
-   56 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+   65 defaultcase: TOK_DEFAULT TOK_CASEDEF code
 
-   57 comparaison: expressionBooleenne TOK_EQ expressionBooleenne
-   58            | expressionBooleenne TOK_NQ expressionBooleenne
-   59            | expressionBooleenne TOK_LT expressionBooleenne
-   60            | expressionBooleenne TOK_GT expressionBooleenne
-   61            | expressionBooleenne TOK_LE expressionBooleenne
-   62            | expressionBooleenne TOK_GE expressionBooleenne
+   66 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+   68 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+   69 comparaison: expressionBooleenne TOK_EQ expressionBooleenne
+   70            | expressionBooleenne TOK_NQ expressionBooleenne
+   71            | expressionBooleenne TOK_LT expressionBooleenne
+   72            | expressionBooleenne TOK_GT expressionBooleenne
+   73            | expressionBooleenne TOK_LE expressionBooleenne
+   74            | expressionBooleenne TOK_GE expressionBooleenne
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256) 4
-    TOK_DECAL (258) 18
+    TOK_DECAL (258) 19
     TOK_MOD (259)
-    TOK_PLUS (260) 41
-    TOK_MOINS (261) 42 43
-    TOK_MUL (262) 44
-    TOK_DIV (263) 45
-    TOK_PUISS (264) 46
-    TOK_OU (265) 50
-    TOK_ET (266) 49
-    TOK_NON (267) 48
-    TOK_EQ (268) 57
-    TOK_NQ (269) 58
-    TOK_LT (270) 59
-    TOK_GT (271) 60
-    TOK_LE (272) 61
-    TOK_GE (273) 62
-    NEG (274)
-    TOK_PARG (275) 16 17 51
-    TOK_PARD (276) 16 17 51
-    TOK_NOMBRE <texte> (277) 25
-    TOK_STR <texte> (278) 26
-    TOK_VAR <texte> (279) 21
-    TOK_VARB <texte> (280) 47
-    TOK_TYPE (281) 14
-    TOK_AFFECT (282) 15
-    TOK_OUVR (283)
-    TOK_FERM (284)
-    TOK_BRACKG (285) 27
-    TOK_BRACKD (286) 27
+    TOK_PLUS (260) 47
+    TOK_MOINS (261) 48 49
+    TOK_MUL (262) 50
+    TOK_DIV (263) 51
+    TOK_PUISS (264) 52
+    TOK_OU (265) 56
+    TOK_ET (266) 55
+    TOK_NON (267) 54
+    TOK_EQ (268) 69
+    TOK_NQ (269) 70
+    TOK_LT (270) 71
+    TOK_GT (271) 72
+    TOK_LE (272) 73
+    TOK_GE (273) 74
+    TOK_PARG (274) 17 18 35 37 46 57
+    TOK_PARD (275) 17 18 35 37 46 57
+    NEG (276)
+    TOK_NOMBRE <texte> (277) 26
+    TOK_STR <texte> (278) 27
+    TOK_VAR <texte> (279) 22
+    TOK_VARB <texte> (280) 53
+    TOK_TYPE (281) 15
+    TOK_AFFECT (282) 16
+    TOK_OUVR (283) 67
+    TOK_FERM (284) 67
+    TOK_BRACKG (285) 28
+    TOK_BRACKD (286) 28
     TOK_ACCOLG (287)
     TOK_ACCOLD (288)
-    TOK_VIRG (289) 28
-    TOK_DPTS (290)
+    TOK_VIRG (289) 29
+    TOK_DPTS (290) 67
     TOK_PIPE (291)
-    TOK_FINSTR (292) 14 15 16 17 18
+    TOK_FINSTR (292) 15 16 17 18 19
     TOK_FINI (293) 1
     TOK_FINF (294) 1
-    TOK_FINB (295)
-    TOK_SI (296) 53 54
-    TOK_ALORS (297) 53 54
-    TOK_SINON (298) 54
-    TOK_FINSI (299) 53 54
-    TOK_CAMBIAR (300)
-    TOK_CASE (301)
-    TOK_FOR (302) 55
-    TOK_DANS (303) 55
-    TOK_FAIRE (304) 55 56
-    TOK_FINFOR (305) 55
-    TOK_TANT (306) 56
-    TOK_FINT (307) 56
-    TOK_LEER (308) 16
-    TOK_ESCRIR (309) 17
+    TOK_SI (295) 59 60
+    TOK_ALORS (296) 59 60
+    TOK_SINON (297) 60
+    TOK_FINSI (298) 59 60
+    TOK_SWITCH (299) 61
+    TOK_CASE (300) 64
+    TOK_DEFAULT (301) 65
+    TOK_CASEDEF (302) 64 65
+    TOK_FINSWITCH (303) 61
+    TOK_FOR (304) 66 67
+    TOK_DANS (305) 66 67
+    TOK_FAIRE (306) 66 67 68
+    TOK_FINFOR (307) 66 67
+    TOK_TANT (308) 68
+    TOK_FINT (309) 68
+    TOK_LEER (310) 17
+    TOK_ESCRIR (311) 18
 
 
 Nonterminals, with rules where they appear
 
-    $accept (55)
+    $accept (57)
         on left: 0
-    script <texte> (56)
+    script <texte> (58)
         on left: 1
         on right: 0
-    code <texte> (57)
+    code <texte> (59)
         on left: 2 3 4
-        on right: 1 3 4 53 54 55 56
-    instruction <texte> (58)
-        on left: 5 6 7 8 9 10 11 13
+        on right: 1 3 4 59 60 64 65 66 67 68
+    instruction <texte> (60)
+        on left: 5 6 7 8 9 10 11 12 13 14
         on right: 3
-    $@1 (59)
-        on left: 12
-        on right: 13
-    declaration <texte> (60)
-        on left: 14
-        on right: 5
-    affectation <texte> (61)
+    declaration <texte> (61)
         on left: 15
-        on right: 6
-    lecture <texte> (62)
+        on right: 5
+    affectation <texte> (62)
         on left: 16
-        on right: 7
-    ecriture <texte> (63)
+        on right: 6
+    lecture <texte> (63)
         on left: 17
-        on right: 8
-    operationBinaire <texte> (64)
+        on right: 7
+    ecriture <texte> (64)
         on left: 18
+        on right: 8
+    operationBinaire <texte> (65)
+        on left: 19
         on right: 9
-    variable <texte> (65)
-        on left: 19 20
-        on right: 17 18 30 55
-    identificateur <texte> (66)
-        on left: 21
-        on right: 14 15 16 19 33 55
-    constant <texte> (67)
-        on left: 22 23 24
-        on right: 20
-    constantArithmetique <texte> (68)
-        on left: 25
-        on right: 22 34
-    constantChaine <texte> (69)
+    variable <texte> (66)
+        on left: 20 21
+        on right: 18 19 31 66 67
+    identificateur <texte> (67)
+        on left: 22
+        on right: 15 16 17 20 38 66 67
+    constant <texte> (68)
+        on left: 23 24 25
+        on right: 21 64
+    constantArithmetique <texte> (69)
         on left: 26
-        on right: 23
-    constantTableau <texte> (70)
+        on right: 23 39
+    constantChaine <texte> (70)
         on left: 27
-        on right: 24
-    elements <texte> (71)
-        on left: 28 29
-        on right: 27 28
-    element <texte> (72)
-        on left: 30
+        on right: 24 34 35
+    constantTableau <texte> (71)
+        on left: 28
+        on right: 25 36 37
+    elements <texte> (72)
+        on left: 29 30
         on right: 28 29
-    expression <texte> (73)
-        on left: 31 32
-        on right: 15
-    expressionArithmetique <texte> (74)
-        on left: 33 34 35 36 37 38 39 40
-        on right: 18 31 41 42 43 44 45 46
-    addition <texte> (75)
-        on left: 41
-        on right: 35
-    soustraction <texte> (76)
-        on left: 42
-        on right: 36
-    inversionSigne <texte> (77)
-        on left: 43
-        on right: 37
-    multiplication <texte> (78)
-        on left: 44
-        on right: 38
-    division <texte> (79)
-        on left: 45
-        on right: 39
-    puissance <texte> (80)
-        on left: 46
+    element <texte> (73)
+        on left: 31
+        on right: 29 30
+    expression <texte> (74)
+        on left: 32 33 34 35 36 37
+        on right: 16 61
+    expressionArithmetique <texte> (75)
+        on left: 38 39 40 41 42 43 44 45 46
+        on right: 19 32 46 47 48 49 50 51 52
+    addition <texte> (76)
+        on left: 47
         on right: 40
-    expressionBooleenne <texte> (81)
-        on left: 47 48 49 50 51 52
-        on right: 32 48 49 50 51 53 54 56 57 58 59 60 61 62
-    boucleSi <texte> (82)
-        on left: 53
+    soustraction <texte> (77)
+        on left: 48
+        on right: 41
+    inversionSigne <texte> (78)
+        on left: 49
+        on right: 42
+    multiplication <texte> (79)
+        on left: 50
+        on right: 43
+    division <texte> (80)
+        on left: 51
+        on right: 44
+    puissance <texte> (81)
+        on left: 52
+        on right: 45
+    expressionBooleenne <texte> (82)
+        on left: 53 54 55 56 57 58
+        on right: 33 54 55 56 57 59 60 68 69 70 71 72 73 74
+    boucleSi <texte> (83)
+        on left: 59
         on right: 10
-    boucleSiSinon <texte> (83)
-        on left: 54
+    boucleSiSinon <texte> (84)
+        on left: 60
         on right: 11
-    bouclePour <texte> (84)
-        on left: 55
+    boucleSwitch <texte> (85)
+        on left: 61
+        on right: 12
+    cases <texte> (86)
+        on left: 62 63
+        on right: 61 63
+    case <texte> (87)
+        on left: 64
+        on right: 62 63
+    defaultcase <texte> (88)
+        on left: 65
+        on right: 61
+    bouclePour <texte> (89)
+        on left: 66 67
         on right: 13
-    boucleTantQue <texte> (85)
-        on left: 56
-        on right: 13
-    comparaison <texte> (86)
-        on left: 57 58 59 60 61 62
-        on right: 52
+    boucleTantQue <texte> (90)
+        on left: 68
+        on right: 14
+    comparaison <texte> (91)
+        on left: 69 70 71 72 73 74
+        on right: 58
 
 
 State 0
@@ -309,24 +328,29 @@ State 3
     9            | . operationBinaire
    10            | . boucleSi
    11            | . boucleSiSinon
-   13            | . bouclePour $@1 boucleTantQue
-   14 declaration: . TOK_TYPE identificateur TOK_FINSTR
-   15 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
-   16 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
-   17 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
-   18 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   53 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   55 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
 
     error       shift, and go to state 5
     TOK_NOMBRE  shift, and go to state 6
@@ -336,25 +360,29 @@ State 3
     TOK_BRACKG  shift, and go to state 10
     TOK_FINF    shift, and go to state 11
     TOK_SI      shift, and go to state 12
-    TOK_FOR     shift, and go to state 13
-    TOK_LEER    shift, and go to state 14
-    TOK_ESCRIR  shift, and go to state 15
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
 
-    instruction           go to state 16
-    declaration           go to state 17
-    affectation           go to state 18
-    lecture               go to state 19
-    ecriture              go to state 20
-    operationBinaire      go to state 21
-    variable              go to state 22
-    identificateur        go to state 23
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    boucleSi              go to state 28
-    boucleSiSinon         go to state 29
-    bouclePour            go to state 30
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
 
 
 State 4
@@ -373,64 +401,64 @@ State 5
 
 State 6
 
-   25 constantArithmetique: TOK_NOMBRE .
+   26 constantArithmetique: TOK_NOMBRE .
 
-    $default  reduce using rule 25 (constantArithmetique)
+    $default  reduce using rule 26 (constantArithmetique)
 
 
 State 7
 
-   26 constantChaine: TOK_STR .
+   27 constantChaine: TOK_STR .
 
-    $default  reduce using rule 26 (constantChaine)
+    $default  reduce using rule 27 (constantChaine)
 
 
 State 8
 
-   21 identificateur: TOK_VAR .
+   22 identificateur: TOK_VAR .
 
-    $default  reduce using rule 21 (identificateur)
+    $default  reduce using rule 22 (identificateur)
 
 
 State 9
 
-   14 declaration: TOK_TYPE . identificateur TOK_FINSTR
-   21 identificateur: . TOK_VAR
+   15 declaration: TOK_TYPE . identificateur TOK_FINSTR
+   22 identificateur: . TOK_VAR
 
     TOK_VAR  shift, and go to state 8
 
-    identificateur  go to state 31
+    identificateur  go to state 35
 
 
 State 10
 
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   27                | TOK_BRACKG . elements TOK_BRACKD
-   28 elements: . elements TOK_VIRG element
-   29         | . element
-   30 element: . variable
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   28                | TOK_BRACKG . elements TOK_BRACKD
+   29 elements: . elements TOK_VIRG element
+   30         | . element
+   31 element: . variable
 
     TOK_NOMBRE  shift, and go to state 6
     TOK_STR     shift, and go to state 7
     TOK_VAR     shift, and go to state 8
     TOK_BRACKG  shift, and go to state 10
 
-    variable              go to state 32
-    identificateur        go to state 33
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    elements              go to state 34
-    element               go to state 35
+    variable              go to state 36
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    elements              go to state 38
+    element               go to state 39
 
 
 State 11
@@ -442,1796 +470,2033 @@ State 11
 
 State 12
 
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   53 boucleSi: TOK_SI . expressionBooleenne TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: TOK_SI . expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   59 boucleSi: TOK_SI . expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: TOK_SI . expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
 
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
 
-    expressionBooleenne  go to state 39
-    comparaison          go to state 40
+    expressionBooleenne  go to state 43
+    comparaison          go to state 44
 
 
 State 13
 
-   21 identificateur: . TOK_VAR
-   55 bouclePour: TOK_FOR . identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   32 expression: . expressionArithmetique
+   33           | . expressionBooleenne
+   34           | . constantChaine
+   35           | . TOK_PARG constantChaine TOK_PARD
+   36           | . constantTableau
+   37           | . TOK_PARG constantTableau TOK_PARD
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   61 boucleSwitch: TOK_SWITCH . expression cases defaultcase TOK_FINSWITCH
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
 
-    TOK_VAR  shift, and go to state 8
+    TOK_MOINS   shift, and go to state 45
+    TOK_NON     shift, and go to state 40
+    TOK_PARG    shift, and go to state 46
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_VARB    shift, and go to state 42
+    TOK_BRACKG  shift, and go to state 10
 
-    identificateur  go to state 41
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    constantChaine          go to state 49
+    constantTableau         go to state 50
+    expression              go to state 51
+    expressionArithmetique  go to state 52
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+    expressionBooleenne     go to state 59
+    comparaison             go to state 44
 
 
 State 14
 
-   16 lecture: TOK_LEER . TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   22 identificateur: . TOK_VAR
+   66 bouclePour: TOK_FOR . identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | TOK_FOR . identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
 
-    TOK_PARG  shift, and go to state 42
+    TOK_VAR  shift, and go to state 8
+
+    identificateur  go to state 60
 
 
 State 15
 
-   17 ecriture: TOK_ESCRIR . TOK_PARG variable TOK_PARD TOK_FINSTR
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   68 boucleTantQue: TOK_TANT . expressionBooleenne TOK_FAIRE code TOK_FINT
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
 
-    TOK_PARG  shift, and go to state 43
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 61
+    comparaison          go to state 44
 
 
 State 16
+
+   17 lecture: TOK_LEER . TOK_PARG identificateur TOK_PARD TOK_FINSTR
+
+    TOK_PARG  shift, and go to state 62
+
+
+State 17
+
+   18 ecriture: TOK_ESCRIR . TOK_PARG variable TOK_PARD TOK_FINSTR
+
+    TOK_PARG  shift, and go to state 63
+
+
+State 18
 
     3 code: code instruction .
 
     $default  reduce using rule 3 (code)
 
 
-State 17
+State 19
 
     5 instruction: declaration .
 
     $default  reduce using rule 5 (instruction)
 
 
-State 18
+State 20
 
     6 instruction: affectation .
 
     $default  reduce using rule 6 (instruction)
 
 
-State 19
+State 21
 
     7 instruction: lecture .
 
     $default  reduce using rule 7 (instruction)
 
 
-State 20
+State 22
 
     8 instruction: ecriture .
 
     $default  reduce using rule 8 (instruction)
 
 
-State 21
+State 23
 
     9 instruction: operationBinaire .
 
     $default  reduce using rule 9 (instruction)
 
 
-State 22
-
-   18 operationBinaire: variable . TOK_DECAL expressionArithmetique TOK_FINSTR
-
-    TOK_DECAL  shift, and go to state 44
-
-
-State 23
-
-   15 affectation: identificateur . TOK_AFFECT expression TOK_FINSTR
-   19 variable: identificateur .  [TOK_DECAL]
-
-    TOK_AFFECT  shift, and go to state 45
-
-    $default  reduce using rule 19 (variable)
-
-
 State 24
 
-   20 variable: constant .
+   19 operationBinaire: variable . TOK_DECAL expressionArithmetique TOK_FINSTR
 
-    $default  reduce using rule 20 (variable)
+    TOK_DECAL  shift, and go to state 64
 
 
 State 25
 
-   22 constant: constantArithmetique .
+   16 affectation: identificateur . TOK_AFFECT expression TOK_FINSTR
+   20 variable: identificateur .  [TOK_DECAL]
 
-    $default  reduce using rule 22 (constant)
+    TOK_AFFECT  shift, and go to state 65
+
+    $default  reduce using rule 20 (variable)
 
 
 State 26
 
-   23 constant: constantChaine .
+   21 variable: constant .
 
-    $default  reduce using rule 23 (constant)
+    $default  reduce using rule 21 (variable)
 
 
 State 27
 
-   24 constant: constantTableau .
+   23 constant: constantArithmetique .
+
+    $default  reduce using rule 23 (constant)
+
+
+State 28
+
+   24 constant: constantChaine .
 
     $default  reduce using rule 24 (constant)
 
 
-State 28
+State 29
+
+   25 constant: constantTableau .
+
+    $default  reduce using rule 25 (constant)
+
+
+State 30
 
    10 instruction: boucleSi .
 
     $default  reduce using rule 10 (instruction)
 
 
-State 29
+State 31
 
    11 instruction: boucleSiSinon .
 
     $default  reduce using rule 11 (instruction)
 
 
-State 30
-
-   12 $@1: . %empty
-   13 instruction: bouclePour . $@1 boucleTantQue
-
-    $default  reduce using rule 12 ($@1)
-
-    $@1  go to state 46
-
-
-State 31
-
-   14 declaration: TOK_TYPE identificateur . TOK_FINSTR
-
-    TOK_FINSTR  shift, and go to state 47
-
-
 State 32
 
-   30 element: variable .
+   12 instruction: boucleSwitch .
 
-    $default  reduce using rule 30 (element)
+    $default  reduce using rule 12 (instruction)
 
 
 State 33
 
-   19 variable: identificateur .
-
-    $default  reduce using rule 19 (variable)
-
-
-State 34
-
-   27 constantTableau: TOK_BRACKG elements . TOK_BRACKD
-   28 elements: elements . TOK_VIRG element
-
-    TOK_BRACKD  shift, and go to state 48
-    TOK_VIRG    shift, and go to state 49
-
-
-State 35
-
-   29 elements: element .
-
-    $default  reduce using rule 29 (elements)
-
-
-State 36
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   48                    | TOK_NON . expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 50
-    comparaison          go to state 40
-
-
-State 37
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   51                    | TOK_PARG . expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 51
-    comparaison          go to state 40
-
-
-State 38
-
-   47 expressionBooleenne: TOK_VARB .
-
-    $default  reduce using rule 47 (expressionBooleenne)
-
-
-State 39
-
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   53 boucleSi: TOK_SI expressionBooleenne . TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: TOK_SI expressionBooleenne . TOK_ALORS code TOK_SINON code TOK_FINSI
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
-
-    TOK_OU     shift, and go to state 52
-    TOK_ET     shift, and go to state 53
-    TOK_EQ     shift, and go to state 54
-    TOK_NQ     shift, and go to state 55
-    TOK_LT     shift, and go to state 56
-    TOK_GT     shift, and go to state 57
-    TOK_LE     shift, and go to state 58
-    TOK_GE     shift, and go to state 59
-    TOK_ALORS  shift, and go to state 60
-
-
-State 40
-
-   52 expressionBooleenne: comparaison .
-
-    $default  reduce using rule 52 (expressionBooleenne)
-
-
-State 41
-
-   55 bouclePour: TOK_FOR identificateur . TOK_DANS variable TOK_FAIRE code TOK_FINFOR
-
-    TOK_DANS  shift, and go to state 61
-
-
-State 42
-
-   16 lecture: TOK_LEER TOK_PARG . identificateur TOK_PARD TOK_FINSTR
-   21 identificateur: . TOK_VAR
-
-    TOK_VAR  shift, and go to state 8
-
-    identificateur  go to state 62
-
-
-State 43
-
-   17 ecriture: TOK_ESCRIR TOK_PARG . variable TOK_PARD TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
-    TOK_VAR     shift, and go to state 8
-    TOK_BRACKG  shift, and go to state 10
-
-    variable              go to state 63
-    identificateur        go to state 33
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-
-
-State 44
-
-   18 operationBinaire: variable TOK_DECAL . expressionArithmetique TOK_FINSTR
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
-
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 67
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
-
-
-State 45
-
-   15 affectation: identificateur TOK_AFFECT . expression TOK_FINSTR
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   31 expression: . expressionArithmetique
-   32           | . expressionBooleenne
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_MOINS   shift, and go to state 64
-    TOK_NON     shift, and go to state 36
-    TOK_PARG    shift, and go to state 37
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-    TOK_VARB    shift, and go to state 38
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expression              go to state 74
-    expressionArithmetique  go to state 75
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
-    expressionBooleenne     go to state 76
-    comparaison             go to state 40
-
-
-State 46
-
-   13 instruction: bouclePour $@1 . boucleTantQue
-   56 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
-
-    TOK_TANT  shift, and go to state 77
-
-    boucleTantQue  go to state 78
-
-
-State 47
-
-   14 declaration: TOK_TYPE identificateur TOK_FINSTR .
-
-    $default  reduce using rule 14 (declaration)
-
-
-State 48
-
-   27 constantTableau: TOK_BRACKG elements TOK_BRACKD .
-
-    $default  reduce using rule 27 (constantTableau)
-
-
-State 49
-
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   28 elements: elements TOK_VIRG . element
-   30 element: . variable
-
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
-    TOK_VAR     shift, and go to state 8
-    TOK_BRACKG  shift, and go to state 10
-
-    variable              go to state 32
-    identificateur        go to state 33
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    element               go to state 79
-
-
-State 50
-
-   48 expressionBooleenne: TOK_NON expressionBooleenne .  [TOK_OU, TOK_ET, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   49                    | expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
-
-    TOK_EQ  shift, and go to state 54
-    TOK_NQ  shift, and go to state 55
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
-
-    $default  reduce using rule 48 (expressionBooleenne)
-
-    Conflict between rule 48 and token TOK_OU resolved as reduce (TOK_OU < TOK_NON).
-    Conflict between rule 48 and token TOK_ET resolved as reduce (TOK_ET < TOK_NON).
-    Conflict between rule 48 and token TOK_EQ resolved as shift (TOK_NON < TOK_EQ).
-    Conflict between rule 48 and token TOK_NQ resolved as shift (TOK_NON < TOK_NQ).
-    Conflict between rule 48 and token TOK_LT resolved as shift (TOK_NON < TOK_LT).
-    Conflict between rule 48 and token TOK_GT resolved as shift (TOK_NON < TOK_GT).
-    Conflict between rule 48 and token TOK_LE resolved as shift (TOK_NON < TOK_LE).
-    Conflict between rule 48 and token TOK_GE resolved as shift (TOK_NON < TOK_GE).
-
-
-State 51
-
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   51                    | TOK_PARG expressionBooleenne . TOK_PARD
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
-
-    TOK_OU    shift, and go to state 52
-    TOK_ET    shift, and go to state 53
-    TOK_EQ    shift, and go to state 54
-    TOK_NQ    shift, and go to state 55
-    TOK_LT    shift, and go to state 56
-    TOK_GT    shift, and go to state 57
-    TOK_LE    shift, and go to state 58
-    TOK_GE    shift, and go to state 59
-    TOK_PARD  shift, and go to state 80
-
-
-State 52
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   50                    | expressionBooleenne TOK_OU . expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 81
-    comparaison          go to state 40
-
-
-State 53
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   49                    | expressionBooleenne TOK_ET . expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 82
-    comparaison          go to state 40
-
-
-State 54
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   57            | expressionBooleenne TOK_EQ . expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 83
-    comparaison          go to state 40
-
-
-State 55
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   58            | expressionBooleenne TOK_NQ . expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 84
-    comparaison          go to state 40
-
-
-State 56
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   59            | expressionBooleenne TOK_LT . expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 85
-    comparaison          go to state 40
-
-
-State 57
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   60            | expressionBooleenne TOK_GT . expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 86
-    comparaison          go to state 40
-
-
-State 58
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   61            | expressionBooleenne TOK_LE . expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 87
-    comparaison          go to state 40
-
-
-State 59
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-   62            | expressionBooleenne TOK_GE . expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 88
-    comparaison          go to state 40
-
-
-State 60
-
-    2 code: . %empty
-    3     | . code instruction
-    4     | . code error
-   53 boucleSi: TOK_SI expressionBooleenne TOK_ALORS . code TOK_FINSI
-   54 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS . code TOK_SINON code TOK_FINSI
-
-    $default  reduce using rule 2 (code)
-
-    code  go to state 89
-
-
-State 61
-
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   55 bouclePour: TOK_FOR identificateur TOK_DANS . variable TOK_FAIRE code TOK_FINFOR
-
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
-    TOK_VAR     shift, and go to state 8
-    TOK_BRACKG  shift, and go to state 10
-
-    variable              go to state 90
-    identificateur        go to state 33
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-
-
-State 62
-
-   16 lecture: TOK_LEER TOK_PARG identificateur . TOK_PARD TOK_FINSTR
-
-    TOK_PARD  shift, and go to state 91
-
-
-State 63
-
-   17 ecriture: TOK_ESCRIR TOK_PARG variable . TOK_PARD TOK_FINSTR
-
-    TOK_PARD  shift, and go to state 92
-
-
-State 64
-
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   43               | TOK_MOINS . expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
-
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 93
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
-
-
-State 65
-
-   33 expressionArithmetique: identificateur .
-
-    $default  reduce using rule 33 (expressionArithmetique)
-
-
-State 66
-
-   34 expressionArithmetique: constantArithmetique .
-
-    $default  reduce using rule 34 (expressionArithmetique)
-
-
-State 67
-
-   18 operationBinaire: variable TOK_DECAL expressionArithmetique . TOK_FINSTR
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
-
-    TOK_PLUS    shift, and go to state 94
-    TOK_MOINS   shift, and go to state 95
-    TOK_MUL     shift, and go to state 96
-    TOK_DIV     shift, and go to state 97
-    TOK_PUISS   shift, and go to state 98
-    TOK_FINSTR  shift, and go to state 99
-
-
-State 68
-
-   35 expressionArithmetique: addition .
-
-    $default  reduce using rule 35 (expressionArithmetique)
-
-
-State 69
-
-   36 expressionArithmetique: soustraction .
-
-    $default  reduce using rule 36 (expressionArithmetique)
-
-
-State 70
-
-   37 expressionArithmetique: inversionSigne .
-
-    $default  reduce using rule 37 (expressionArithmetique)
-
-
-State 71
-
-   38 expressionArithmetique: multiplication .
-
-    $default  reduce using rule 38 (expressionArithmetique)
-
-
-State 72
-
-   39 expressionArithmetique: division .
-
-    $default  reduce using rule 39 (expressionArithmetique)
-
-
-State 73
-
-   40 expressionArithmetique: puissance .
-
-    $default  reduce using rule 40 (expressionArithmetique)
-
-
-State 74
-
-   15 affectation: identificateur TOK_AFFECT expression . TOK_FINSTR
-
-    TOK_FINSTR  shift, and go to state 100
-
-
-State 75
-
-   31 expression: expressionArithmetique .  [TOK_FINSTR]
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
-
-    TOK_PLUS   shift, and go to state 94
-    TOK_MOINS  shift, and go to state 95
-    TOK_MUL    shift, and go to state 96
-    TOK_DIV    shift, and go to state 97
-    TOK_PUISS  shift, and go to state 98
-
-    $default  reduce using rule 31 (expression)
-
-
-State 76
-
-   32 expression: expressionBooleenne .  [TOK_FINSTR]
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
-
-    TOK_OU  shift, and go to state 52
-    TOK_ET  shift, and go to state 53
-    TOK_EQ  shift, and go to state 54
-    TOK_NQ  shift, and go to state 55
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
-
-    $default  reduce using rule 32 (expression)
-
-
-State 77
-
-   47 expressionBooleenne: . TOK_VARB
-   48                    | . TOK_NON expressionBooleenne
-   49                    | . expressionBooleenne TOK_ET expressionBooleenne
-   50                    | . expressionBooleenne TOK_OU expressionBooleenne
-   51                    | . TOK_PARG expressionBooleenne TOK_PARD
-   52                    | . comparaison
-   56 boucleTantQue: TOK_TANT . expressionBooleenne TOK_FAIRE code TOK_FINT
-   57 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
-   58            | . expressionBooleenne TOK_NQ expressionBooleenne
-   59            | . expressionBooleenne TOK_LT expressionBooleenne
-   60            | . expressionBooleenne TOK_GT expressionBooleenne
-   61            | . expressionBooleenne TOK_LE expressionBooleenne
-   62            | . expressionBooleenne TOK_GE expressionBooleenne
-
-    TOK_NON   shift, and go to state 36
-    TOK_PARG  shift, and go to state 37
-    TOK_VARB  shift, and go to state 38
-
-    expressionBooleenne  go to state 101
-    comparaison          go to state 40
-
-
-State 78
-
-   13 instruction: bouclePour $@1 boucleTantQue .
+   13 instruction: bouclePour .
 
     $default  reduce using rule 13 (instruction)
 
 
+State 34
+
+   14 instruction: boucleTantQue .
+
+    $default  reduce using rule 14 (instruction)
+
+
+State 35
+
+   15 declaration: TOK_TYPE identificateur . TOK_FINSTR
+
+    TOK_FINSTR  shift, and go to state 66
+
+
+State 36
+
+   31 element: variable .
+
+    $default  reduce using rule 31 (element)
+
+
+State 37
+
+   20 variable: identificateur .
+
+    $default  reduce using rule 20 (variable)
+
+
+State 38
+
+   28 constantTableau: TOK_BRACKG elements . TOK_BRACKD
+   29 elements: elements . TOK_VIRG element
+
+    TOK_BRACKD  shift, and go to state 67
+    TOK_VIRG    shift, and go to state 68
+
+
+State 39
+
+   30 elements: element .
+
+    $default  reduce using rule 30 (elements)
+
+
+State 40
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   54                    | TOK_NON . expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 69
+    comparaison          go to state 44
+
+
+State 41
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   57                    | TOK_PARG . expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 70
+    comparaison          go to state 44
+
+
+State 42
+
+   53 expressionBooleenne: TOK_VARB .
+
+    $default  reduce using rule 53 (expressionBooleenne)
+
+
+State 43
+
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   59 boucleSi: TOK_SI expressionBooleenne . TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: TOK_SI expressionBooleenne . TOK_ALORS code TOK_SINON code TOK_FINSI
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+
+    TOK_OU     shift, and go to state 71
+    TOK_ET     shift, and go to state 72
+    TOK_EQ     shift, and go to state 73
+    TOK_NQ     shift, and go to state 74
+    TOK_LT     shift, and go to state 75
+    TOK_GT     shift, and go to state 76
+    TOK_LE     shift, and go to state 77
+    TOK_GE     shift, and go to state 78
+    TOK_ALORS  shift, and go to state 79
+
+
+State 44
+
+   58 expressionBooleenne: comparaison .
+
+    $default  reduce using rule 58 (expressionBooleenne)
+
+
+State 45
+
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   49               | TOK_MOINS . expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 81
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+
+
+State 46
+
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   35 expression: TOK_PARG . constantChaine TOK_PARD
+   37           | TOK_PARG . constantTableau TOK_PARD
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   46                       | TOK_PARG . expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   57                    | TOK_PARG . expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_MOINS   shift, and go to state 45
+    TOK_NON     shift, and go to state 40
+    TOK_PARG    shift, and go to state 82
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_VARB    shift, and go to state 42
+    TOK_BRACKG  shift, and go to state 10
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    constantChaine          go to state 83
+    constantTableau         go to state 84
+    expressionArithmetique  go to state 85
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+    expressionBooleenne     go to state 70
+    comparaison             go to state 44
+
+
+State 47
+
+   38 expressionArithmetique: identificateur .
+
+    $default  reduce using rule 38 (expressionArithmetique)
+
+
+State 48
+
+   39 expressionArithmetique: constantArithmetique .
+
+    $default  reduce using rule 39 (expressionArithmetique)
+
+
+State 49
+
+   34 expression: constantChaine .
+
+    $default  reduce using rule 34 (expression)
+
+
+State 50
+
+   36 expression: constantTableau .
+
+    $default  reduce using rule 36 (expression)
+
+
+State 51
+
+   61 boucleSwitch: TOK_SWITCH expression . cases defaultcase TOK_FINSWITCH
+   62 cases: . case
+   63      | . case cases
+   64 case: . TOK_CASE constant TOK_CASEDEF code
+
+    TOK_CASE  shift, and go to state 86
+
+    cases  go to state 87
+    case   go to state 88
+
+
+State 52
+
+   32 expression: expressionArithmetique .  [TOK_FINSTR, TOK_CASE]
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+
+    TOK_PLUS   shift, and go to state 89
+    TOK_MOINS  shift, and go to state 90
+    TOK_MUL    shift, and go to state 91
+    TOK_DIV    shift, and go to state 92
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 32 (expression)
+
+
+State 53
+
+   40 expressionArithmetique: addition .
+
+    $default  reduce using rule 40 (expressionArithmetique)
+
+
+State 54
+
+   41 expressionArithmetique: soustraction .
+
+    $default  reduce using rule 41 (expressionArithmetique)
+
+
+State 55
+
+   42 expressionArithmetique: inversionSigne .
+
+    $default  reduce using rule 42 (expressionArithmetique)
+
+
+State 56
+
+   43 expressionArithmetique: multiplication .
+
+    $default  reduce using rule 43 (expressionArithmetique)
+
+
+State 57
+
+   44 expressionArithmetique: division .
+
+    $default  reduce using rule 44 (expressionArithmetique)
+
+
+State 58
+
+   45 expressionArithmetique: puissance .
+
+    $default  reduce using rule 45 (expressionArithmetique)
+
+
+State 59
+
+   33 expression: expressionBooleenne .  [TOK_FINSTR, TOK_CASE]
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+
+    TOK_OU  shift, and go to state 71
+    TOK_ET  shift, and go to state 72
+    TOK_EQ  shift, and go to state 73
+    TOK_NQ  shift, and go to state 74
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
+
+    $default  reduce using rule 33 (expression)
+
+
+State 60
+
+   66 bouclePour: TOK_FOR identificateur . TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | TOK_FOR identificateur . TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+    TOK_DANS  shift, and go to state 94
+
+
+State 61
+
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   68 boucleTantQue: TOK_TANT expressionBooleenne . TOK_FAIRE code TOK_FINT
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+
+    TOK_OU     shift, and go to state 71
+    TOK_ET     shift, and go to state 72
+    TOK_EQ     shift, and go to state 73
+    TOK_NQ     shift, and go to state 74
+    TOK_LT     shift, and go to state 75
+    TOK_GT     shift, and go to state 76
+    TOK_LE     shift, and go to state 77
+    TOK_GE     shift, and go to state 78
+    TOK_FAIRE  shift, and go to state 95
+
+
+State 62
+
+   17 lecture: TOK_LEER TOK_PARG . identificateur TOK_PARD TOK_FINSTR
+   22 identificateur: . TOK_VAR
+
+    TOK_VAR  shift, and go to state 8
+
+    identificateur  go to state 96
+
+
+State 63
+
+   18 ecriture: TOK_ESCRIR TOK_PARG . variable TOK_PARD TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_BRACKG  shift, and go to state 10
+
+    variable              go to state 97
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+
+
+State 64
+
+   19 operationBinaire: variable TOK_DECAL . expressionArithmetique TOK_FINSTR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 98
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+
+
+State 65
+
+   16 affectation: identificateur TOK_AFFECT . expression TOK_FINSTR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   32 expression: . expressionArithmetique
+   33           | . expressionBooleenne
+   34           | . constantChaine
+   35           | . TOK_PARG constantChaine TOK_PARD
+   36           | . constantTableau
+   37           | . TOK_PARG constantTableau TOK_PARD
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_MOINS   shift, and go to state 45
+    TOK_NON     shift, and go to state 40
+    TOK_PARG    shift, and go to state 46
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_VARB    shift, and go to state 42
+    TOK_BRACKG  shift, and go to state 10
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    constantChaine          go to state 49
+    constantTableau         go to state 50
+    expression              go to state 99
+    expressionArithmetique  go to state 52
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+    expressionBooleenne     go to state 59
+    comparaison             go to state 44
+
+
+State 66
+
+   15 declaration: TOK_TYPE identificateur TOK_FINSTR .
+
+    $default  reduce using rule 15 (declaration)
+
+
+State 67
+
+   28 constantTableau: TOK_BRACKG elements TOK_BRACKD .
+
+    $default  reduce using rule 28 (constantTableau)
+
+
+State 68
+
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   29 elements: elements TOK_VIRG . element
+   31 element: . variable
+
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_BRACKG  shift, and go to state 10
+
+    variable              go to state 36
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    element               go to state 100
+
+
+State 69
+
+   54 expressionBooleenne: TOK_NON expressionBooleenne .  [TOK_OU, TOK_ET, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   55                    | expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+
+    TOK_EQ  shift, and go to state 73
+    TOK_NQ  shift, and go to state 74
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
+
+    $default  reduce using rule 54 (expressionBooleenne)
+
+    Conflict between rule 54 and token TOK_OU resolved as reduce (TOK_OU < TOK_NON).
+    Conflict between rule 54 and token TOK_ET resolved as reduce (TOK_ET < TOK_NON).
+    Conflict between rule 54 and token TOK_EQ resolved as shift (TOK_NON < TOK_EQ).
+    Conflict between rule 54 and token TOK_NQ resolved as shift (TOK_NON < TOK_NQ).
+    Conflict between rule 54 and token TOK_LT resolved as shift (TOK_NON < TOK_LT).
+    Conflict between rule 54 and token TOK_GT resolved as shift (TOK_NON < TOK_GT).
+    Conflict between rule 54 and token TOK_LE resolved as shift (TOK_NON < TOK_LE).
+    Conflict between rule 54 and token TOK_GE resolved as shift (TOK_NON < TOK_GE).
+
+
+State 70
+
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   57                    | TOK_PARG expressionBooleenne . TOK_PARD
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+
+    TOK_OU    shift, and go to state 71
+    TOK_ET    shift, and go to state 72
+    TOK_EQ    shift, and go to state 73
+    TOK_NQ    shift, and go to state 74
+    TOK_LT    shift, and go to state 75
+    TOK_GT    shift, and go to state 76
+    TOK_LE    shift, and go to state 77
+    TOK_GE    shift, and go to state 78
+    TOK_PARD  shift, and go to state 101
+
+
+State 71
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   56                    | expressionBooleenne TOK_OU . expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 102
+    comparaison          go to state 44
+
+
+State 72
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   55                    | expressionBooleenne TOK_ET . expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 103
+    comparaison          go to state 44
+
+
+State 73
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   69            | expressionBooleenne TOK_EQ . expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 104
+    comparaison          go to state 44
+
+
+State 74
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   70            | expressionBooleenne TOK_NQ . expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 105
+    comparaison          go to state 44
+
+
+State 75
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   71            | expressionBooleenne TOK_LT . expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 106
+    comparaison          go to state 44
+
+
+State 76
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   72            | expressionBooleenne TOK_GT . expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 107
+    comparaison          go to state 44
+
+
+State 77
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   73            | expressionBooleenne TOK_LE . expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 108
+    comparaison          go to state 44
+
+
+State 78
+
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
+   74            | expressionBooleenne TOK_GE . expressionBooleenne
+
+    TOK_NON   shift, and go to state 40
+    TOK_PARG  shift, and go to state 41
+    TOK_VARB  shift, and go to state 42
+
+    expressionBooleenne  go to state 109
+    comparaison          go to state 44
+
+
 State 79
 
-   28 elements: elements TOK_VIRG element .
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   59 boucleSi: TOK_SI expressionBooleenne TOK_ALORS . code TOK_FINSI
+   60 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS . code TOK_SINON code TOK_FINSI
 
-    $default  reduce using rule 28 (elements)
+    $default  reduce using rule 2 (code)
+
+    code  go to state 110
 
 
 State 80
 
-   51 expressionBooleenne: TOK_PARG expressionBooleenne TOK_PARD .
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   46                       | TOK_PARG . expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
 
-    $default  reduce using rule 51 (expressionBooleenne)
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 85
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 81
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   50                    | expressionBooleenne TOK_OU expressionBooleenne .  [TOK_OU, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   49 inversionSigne: TOK_MOINS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_PUISS, TOK_PARD, TOK_FINSTR, TOK_CASE]
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
 
-    TOK_ET  shift, and go to state 53
-    TOK_EQ  shift, and go to state 54
-    TOK_NQ  shift, and go to state 55
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
+    $default  reduce using rule 49 (inversionSigne)
 
-    $default  reduce using rule 50 (expressionBooleenne)
-
-    Conflict between rule 50 and token TOK_OU resolved as reduce (%left TOK_OU).
-    Conflict between rule 50 and token TOK_ET resolved as shift (TOK_OU < TOK_ET).
-    Conflict between rule 50 and token TOK_EQ resolved as shift (TOK_OU < TOK_EQ).
-    Conflict between rule 50 and token TOK_NQ resolved as shift (TOK_OU < TOK_NQ).
-    Conflict between rule 50 and token TOK_LT resolved as shift (TOK_OU < TOK_LT).
-    Conflict between rule 50 and token TOK_GT resolved as shift (TOK_OU < TOK_GT).
-    Conflict between rule 50 and token TOK_LE resolved as shift (TOK_OU < TOK_LE).
-    Conflict between rule 50 and token TOK_GE resolved as shift (TOK_OU < TOK_GE).
+    Conflict between rule 49 and token TOK_PLUS resolved as reduce (TOK_PLUS < NEG).
+    Conflict between rule 49 and token TOK_MOINS resolved as reduce (TOK_MOINS < NEG).
+    Conflict between rule 49 and token TOK_MUL resolved as reduce (TOK_MUL < NEG).
+    Conflict between rule 49 and token TOK_DIV resolved as reduce (TOK_DIV < NEG).
+    Conflict between rule 49 and token TOK_PUISS resolved as reduce (TOK_PUISS < NEG).
 
 
 State 82
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   49                    | expressionBooleenne TOK_ET expressionBooleenne .  [TOK_OU, TOK_ET, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   46                       | TOK_PARG . expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   53 expressionBooleenne: . TOK_VARB
+   54                    | . TOK_NON expressionBooleenne
+   55                    | . expressionBooleenne TOK_ET expressionBooleenne
+   56                    | . expressionBooleenne TOK_OU expressionBooleenne
+   57                    | . TOK_PARG expressionBooleenne TOK_PARD
+   57                    | TOK_PARG . expressionBooleenne TOK_PARD
+   58                    | . comparaison
+   69 comparaison: . expressionBooleenne TOK_EQ expressionBooleenne
+   70            | . expressionBooleenne TOK_NQ expressionBooleenne
+   71            | . expressionBooleenne TOK_LT expressionBooleenne
+   72            | . expressionBooleenne TOK_GT expressionBooleenne
+   73            | . expressionBooleenne TOK_LE expressionBooleenne
+   74            | . expressionBooleenne TOK_GE expressionBooleenne
 
-    TOK_EQ  shift, and go to state 54
-    TOK_NQ  shift, and go to state 55
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
+    TOK_MOINS   shift, and go to state 45
+    TOK_NON     shift, and go to state 40
+    TOK_PARG    shift, and go to state 82
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+    TOK_VARB    shift, and go to state 42
 
-    $default  reduce using rule 49 (expressionBooleenne)
-
-    Conflict between rule 49 and token TOK_OU resolved as reduce (TOK_OU < TOK_ET).
-    Conflict between rule 49 and token TOK_ET resolved as reduce (%left TOK_ET).
-    Conflict between rule 49 and token TOK_EQ resolved as shift (TOK_ET < TOK_EQ).
-    Conflict between rule 49 and token TOK_NQ resolved as shift (TOK_ET < TOK_NQ).
-    Conflict between rule 49 and token TOK_LT resolved as shift (TOK_ET < TOK_LT).
-    Conflict between rule 49 and token TOK_GT resolved as shift (TOK_ET < TOK_GT).
-    Conflict between rule 49 and token TOK_LE resolved as shift (TOK_ET < TOK_LE).
-    Conflict between rule 49 and token TOK_GE resolved as shift (TOK_ET < TOK_GE).
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 85
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
+    expressionBooleenne     go to state 70
+    comparaison             go to state 44
 
 
 State 83
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   57            | expressionBooleenne TOK_EQ expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   35 expression: TOK_PARG constantChaine . TOK_PARD
 
-    TOK_NQ  shift, and go to state 55
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
-
-    $default  reduce using rule 57 (comparaison)
-
-    Conflict between rule 57 and token TOK_OU resolved as reduce (TOK_OU < TOK_EQ).
-    Conflict between rule 57 and token TOK_ET resolved as reduce (TOK_ET < TOK_EQ).
-    Conflict between rule 57 and token TOK_EQ resolved as reduce (%left TOK_EQ).
-    Conflict between rule 57 and token TOK_NQ resolved as shift (TOK_EQ < TOK_NQ).
-    Conflict between rule 57 and token TOK_LT resolved as shift (TOK_EQ < TOK_LT).
-    Conflict between rule 57 and token TOK_GT resolved as shift (TOK_EQ < TOK_GT).
-    Conflict between rule 57 and token TOK_LE resolved as shift (TOK_EQ < TOK_LE).
-    Conflict between rule 57 and token TOK_GE resolved as shift (TOK_EQ < TOK_GE).
+    TOK_PARD  shift, and go to state 111
 
 
 State 84
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   58            | expressionBooleenne TOK_NQ expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   37 expression: TOK_PARG constantTableau . TOK_PARD
 
-    TOK_LT  shift, and go to state 56
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
-
-    $default  reduce using rule 58 (comparaison)
-
-    Conflict between rule 58 and token TOK_OU resolved as reduce (TOK_OU < TOK_NQ).
-    Conflict between rule 58 and token TOK_ET resolved as reduce (TOK_ET < TOK_NQ).
-    Conflict between rule 58 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_NQ).
-    Conflict between rule 58 and token TOK_NQ resolved as reduce (%left TOK_NQ).
-    Conflict between rule 58 and token TOK_LT resolved as shift (TOK_NQ < TOK_LT).
-    Conflict between rule 58 and token TOK_GT resolved as shift (TOK_NQ < TOK_GT).
-    Conflict between rule 58 and token TOK_LE resolved as shift (TOK_NQ < TOK_LE).
-    Conflict between rule 58 and token TOK_GE resolved as shift (TOK_NQ < TOK_GE).
+    TOK_PARD  shift, and go to state 112
 
 
 State 85
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   59            | expressionBooleenne TOK_LT expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   46 expressionArithmetique: TOK_PARG expressionArithmetique . TOK_PARD
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
 
-    TOK_GT  shift, and go to state 57
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
-
-    $default  reduce using rule 59 (comparaison)
-
-    Conflict between rule 59 and token TOK_OU resolved as reduce (TOK_OU < TOK_LT).
-    Conflict between rule 59 and token TOK_ET resolved as reduce (TOK_ET < TOK_LT).
-    Conflict between rule 59 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_LT).
-    Conflict between rule 59 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_LT).
-    Conflict between rule 59 and token TOK_LT resolved as reduce (%left TOK_LT).
-    Conflict between rule 59 and token TOK_GT resolved as shift (TOK_LT < TOK_GT).
-    Conflict between rule 59 and token TOK_LE resolved as shift (TOK_LT < TOK_LE).
-    Conflict between rule 59 and token TOK_GE resolved as shift (TOK_LT < TOK_GE).
+    TOK_PLUS   shift, and go to state 89
+    TOK_MOINS  shift, and go to state 90
+    TOK_MUL    shift, and go to state 91
+    TOK_DIV    shift, and go to state 92
+    TOK_PUISS  shift, and go to state 93
+    TOK_PARD   shift, and go to state 113
 
 
 State 86
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   60            | expressionBooleenne TOK_GT expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   64 case: TOK_CASE . constant TOK_CASEDEF code
 
-    TOK_LE  shift, and go to state 58
-    TOK_GE  shift, and go to state 59
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_BRACKG  shift, and go to state 10
 
-    $default  reduce using rule 60 (comparaison)
-
-    Conflict between rule 60 and token TOK_OU resolved as reduce (TOK_OU < TOK_GT).
-    Conflict between rule 60 and token TOK_ET resolved as reduce (TOK_ET < TOK_GT).
-    Conflict between rule 60 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_GT).
-    Conflict between rule 60 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_GT).
-    Conflict between rule 60 and token TOK_LT resolved as reduce (TOK_LT < TOK_GT).
-    Conflict between rule 60 and token TOK_GT resolved as reduce (%left TOK_GT).
-    Conflict between rule 60 and token TOK_LE resolved as shift (TOK_GT < TOK_LE).
-    Conflict between rule 60 and token TOK_GE resolved as shift (TOK_GT < TOK_GE).
+    constant              go to state 114
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
 
 
 State 87
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   61            | expressionBooleenne TOK_LE expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_LE, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   61 boucleSwitch: TOK_SWITCH expression cases . defaultcase TOK_FINSWITCH
+   65 defaultcase: . TOK_DEFAULT TOK_CASEDEF code
 
-    TOK_GE  shift, and go to state 59
+    TOK_DEFAULT  shift, and go to state 115
 
-    $default  reduce using rule 61 (comparaison)
-
-    Conflict between rule 61 and token TOK_OU resolved as reduce (TOK_OU < TOK_LE).
-    Conflict between rule 61 and token TOK_ET resolved as reduce (TOK_ET < TOK_LE).
-    Conflict between rule 61 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_LE).
-    Conflict between rule 61 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_LE).
-    Conflict between rule 61 and token TOK_LT resolved as reduce (TOK_LT < TOK_LE).
-    Conflict between rule 61 and token TOK_GT resolved as reduce (TOK_GT < TOK_LE).
-    Conflict between rule 61 and token TOK_LE resolved as reduce (%left TOK_LE).
-    Conflict between rule 61 and token TOK_GE resolved as shift (TOK_LE < TOK_GE).
+    defaultcase  go to state 116
 
 
 State 88
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
-   62            | expressionBooleenne TOK_GE expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_LE, TOK_GE, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_FAIRE]
+   62 cases: . case
+   62      | case .  [TOK_DEFAULT]
+   63      | . case cases
+   63      | case . cases
+   64 case: . TOK_CASE constant TOK_CASEDEF code
 
-    $default  reduce using rule 62 (comparaison)
+    TOK_CASE  shift, and go to state 86
 
-    Conflict between rule 62 and token TOK_OU resolved as reduce (TOK_OU < TOK_GE).
-    Conflict between rule 62 and token TOK_ET resolved as reduce (TOK_ET < TOK_GE).
-    Conflict between rule 62 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_GE).
-    Conflict between rule 62 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_GE).
-    Conflict between rule 62 and token TOK_LT resolved as reduce (TOK_LT < TOK_GE).
-    Conflict between rule 62 and token TOK_GT resolved as reduce (TOK_GT < TOK_GE).
-    Conflict between rule 62 and token TOK_LE resolved as reduce (TOK_LE < TOK_GE).
-    Conflict between rule 62 and token TOK_GE resolved as reduce (%left TOK_GE).
+    $default  reduce using rule 62 (cases)
+
+    cases  go to state 117
+    case   go to state 88
 
 
 State 89
 
-    3 code: code . instruction
-    4     | code . error
-    5 instruction: . declaration
-    6            | . affectation
-    7            | . lecture
-    8            | . ecriture
-    9            | . operationBinaire
-   10            | . boucleSi
-   11            | . boucleSiSinon
-   13            | . bouclePour $@1 boucleTantQue
-   14 declaration: . TOK_TYPE identificateur TOK_FINSTR
-   15 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
-   16 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
-   17 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
-   18 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   53 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
-   53         | TOK_SI expressionBooleenne TOK_ALORS code . TOK_FINSI
-   54 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   54              | TOK_SI expressionBooleenne TOK_ALORS code . TOK_SINON code TOK_FINSI
-   55 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   47         | expressionArithmetique TOK_PLUS . expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
 
-    error       shift, and go to state 5
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
     TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
     TOK_VAR     shift, and go to state 8
-    TOK_TYPE    shift, and go to state 9
-    TOK_BRACKG  shift, and go to state 10
-    TOK_SI      shift, and go to state 12
-    TOK_SINON   shift, and go to state 102
-    TOK_FINSI   shift, and go to state 103
-    TOK_FOR     shift, and go to state 13
-    TOK_LEER    shift, and go to state 14
-    TOK_ESCRIR  shift, and go to state 15
 
-    instruction           go to state 16
-    declaration           go to state 17
-    affectation           go to state 18
-    lecture               go to state 19
-    ecriture              go to state 20
-    operationBinaire      go to state 21
-    variable              go to state 22
-    identificateur        go to state 23
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    boucleSi              go to state 28
-    boucleSiSinon         go to state 29
-    bouclePour            go to state 30
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 118
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 90
 
-   55 bouclePour: TOK_FOR identificateur TOK_DANS variable . TOK_FAIRE code TOK_FINFOR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   48             | expressionArithmetique TOK_MOINS . expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
 
-    TOK_FAIRE  shift, and go to state 104
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 119
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 91
 
-   16 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD . TOK_FINSTR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   50               | expressionArithmetique TOK_MUL . expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
 
-    TOK_FINSTR  shift, and go to state 105
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 120
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 92
 
-   17 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD . TOK_FINSTR
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   51         | expressionArithmetique TOK_DIV . expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
 
-    TOK_FINSTR  shift, and go to state 106
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
+
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 121
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 93
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   43 inversionSigne: TOK_MOINS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_PUISS, TOK_FINSTR]
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+   22 identificateur: . TOK_VAR
+   26 constantArithmetique: . TOK_NOMBRE
+   38 expressionArithmetique: . identificateur
+   39                       | . constantArithmetique
+   40                       | . addition
+   41                       | . soustraction
+   42                       | . inversionSigne
+   43                       | . multiplication
+   44                       | . division
+   45                       | . puissance
+   46                       | . TOK_PARG expressionArithmetique TOK_PARD
+   47 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
+   48 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
+   49 inversionSigne: . TOK_MOINS expressionArithmetique
+   50 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
+   51 division: . expressionArithmetique TOK_DIV expressionArithmetique
+   52 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   52          | expressionArithmetique TOK_PUISS . expressionArithmetique
 
-    $default  reduce using rule 43 (inversionSigne)
+    TOK_MOINS   shift, and go to state 45
+    TOK_PARG    shift, and go to state 80
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_VAR     shift, and go to state 8
 
-    Conflict between rule 43 and token TOK_PLUS resolved as reduce (TOK_PLUS < NEG).
-    Conflict between rule 43 and token TOK_MOINS resolved as reduce (TOK_MOINS < NEG).
-    Conflict between rule 43 and token TOK_MUL resolved as reduce (TOK_MUL < NEG).
-    Conflict between rule 43 and token TOK_DIV resolved as reduce (TOK_DIV < NEG).
-    Conflict between rule 43 and token TOK_PUISS resolved as reduce (TOK_PUISS < NEG).
+    identificateur          go to state 47
+    constantArithmetique    go to state 48
+    expressionArithmetique  go to state 122
+    addition                go to state 53
+    soustraction            go to state 54
+    inversionSigne          go to state 55
+    multiplication          go to state 56
+    division                go to state 57
+    puissance               go to state 58
 
 
 State 94
 
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   41         | expressionArithmetique TOK_PLUS . expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   66 bouclePour: TOK_FOR identificateur TOK_DANS . variable TOK_FAIRE code TOK_FINFOR
+   67           | TOK_FOR identificateur TOK_DANS . TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
 
-    TOK_MOINS   shift, and go to state 64
     TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
     TOK_VAR     shift, and go to state 8
+    TOK_OUVR    shift, and go to state 123
+    TOK_BRACKG  shift, and go to state 10
 
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 107
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
+    variable              go to state 124
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
 
 
 State 95
 
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   42             | expressionArithmetique TOK_MOINS . expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   68 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE . code TOK_FINT
 
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
+    $default  reduce using rule 2 (code)
 
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 108
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
+    code  go to state 125
 
 
 State 96
 
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   44               | expressionArithmetique TOK_MUL . expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   17 lecture: TOK_LEER TOK_PARG identificateur . TOK_PARD TOK_FINSTR
 
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 109
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
+    TOK_PARD  shift, and go to state 126
 
 
 State 97
 
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   45         | expressionArithmetique TOK_DIV . expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
+   18 ecriture: TOK_ESCRIR TOK_PARG variable . TOK_PARD TOK_FINSTR
 
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 110
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
+    TOK_PARD  shift, and go to state 127
 
 
 State 98
 
-   21 identificateur: . TOK_VAR
-   25 constantArithmetique: . TOK_NOMBRE
-   33 expressionArithmetique: . identificateur
-   34                       | . constantArithmetique
-   35                       | . addition
-   36                       | . soustraction
-   37                       | . inversionSigne
-   38                       | . multiplication
-   39                       | . division
-   40                       | . puissance
-   41 addition: . expressionArithmetique TOK_PLUS expressionArithmetique
-   42 soustraction: . expressionArithmetique TOK_MOINS expressionArithmetique
-   43 inversionSigne: . TOK_MOINS expressionArithmetique
-   44 multiplication: . expressionArithmetique TOK_MUL expressionArithmetique
-   45 division: . expressionArithmetique TOK_DIV expressionArithmetique
-   46 puissance: . expressionArithmetique TOK_PUISS expressionArithmetique
-   46          | expressionArithmetique TOK_PUISS . expressionArithmetique
+   19 operationBinaire: variable TOK_DECAL expressionArithmetique . TOK_FINSTR
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
 
-    TOK_MOINS   shift, and go to state 64
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_VAR     shift, and go to state 8
-
-    identificateur          go to state 65
-    constantArithmetique    go to state 66
-    expressionArithmetique  go to state 111
-    addition                go to state 68
-    soustraction            go to state 69
-    inversionSigne          go to state 70
-    multiplication          go to state 71
-    division                go to state 72
-    puissance               go to state 73
+    TOK_PLUS    shift, and go to state 89
+    TOK_MOINS   shift, and go to state 90
+    TOK_MUL     shift, and go to state 91
+    TOK_DIV     shift, and go to state 92
+    TOK_PUISS   shift, and go to state 93
+    TOK_FINSTR  shift, and go to state 128
 
 
 State 99
 
-   18 operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR .
+   16 affectation: identificateur TOK_AFFECT expression . TOK_FINSTR
 
-    $default  reduce using rule 18 (operationBinaire)
+    TOK_FINSTR  shift, and go to state 129
 
 
 State 100
 
-   15 affectation: identificateur TOK_AFFECT expression TOK_FINSTR .
+   29 elements: elements TOK_VIRG element .
 
-    $default  reduce using rule 15 (affectation)
+    $default  reduce using rule 29 (elements)
 
 
 State 101
 
-   49 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
-   50                    | expressionBooleenne . TOK_OU expressionBooleenne
-   56 boucleTantQue: TOK_TANT expressionBooleenne . TOK_FAIRE code TOK_FINT
-   57 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
-   58            | expressionBooleenne . TOK_NQ expressionBooleenne
-   59            | expressionBooleenne . TOK_LT expressionBooleenne
-   60            | expressionBooleenne . TOK_GT expressionBooleenne
-   61            | expressionBooleenne . TOK_LE expressionBooleenne
-   62            | expressionBooleenne . TOK_GE expressionBooleenne
+   57 expressionBooleenne: TOK_PARG expressionBooleenne TOK_PARD .
 
-    TOK_OU     shift, and go to state 52
-    TOK_ET     shift, and go to state 53
-    TOK_EQ     shift, and go to state 54
-    TOK_NQ     shift, and go to state 55
-    TOK_LT     shift, and go to state 56
-    TOK_GT     shift, and go to state 57
-    TOK_LE     shift, and go to state 58
-    TOK_GE     shift, and go to state 59
-    TOK_FAIRE  shift, and go to state 112
+    $default  reduce using rule 57 (expressionBooleenne)
 
 
 State 102
 
-    2 code: . %empty
-    3     | . code instruction
-    4     | . code error
-   54 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON . code TOK_FINSI
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   56                    | expressionBooleenne TOK_OU expressionBooleenne .  [TOK_OU, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    $default  reduce using rule 2 (code)
+    TOK_ET  shift, and go to state 72
+    TOK_EQ  shift, and go to state 73
+    TOK_NQ  shift, and go to state 74
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
 
-    code  go to state 113
+    $default  reduce using rule 56 (expressionBooleenne)
+
+    Conflict between rule 56 and token TOK_OU resolved as reduce (%left TOK_OU).
+    Conflict between rule 56 and token TOK_ET resolved as shift (TOK_OU < TOK_ET).
+    Conflict between rule 56 and token TOK_EQ resolved as shift (TOK_OU < TOK_EQ).
+    Conflict between rule 56 and token TOK_NQ resolved as shift (TOK_OU < TOK_NQ).
+    Conflict between rule 56 and token TOK_LT resolved as shift (TOK_OU < TOK_LT).
+    Conflict between rule 56 and token TOK_GT resolved as shift (TOK_OU < TOK_GT).
+    Conflict between rule 56 and token TOK_LE resolved as shift (TOK_OU < TOK_LE).
+    Conflict between rule 56 and token TOK_GE resolved as shift (TOK_OU < TOK_GE).
 
 
 State 103
 
-   53 boucleSi: TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI .
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   55                    | expressionBooleenne TOK_ET expressionBooleenne .  [TOK_OU, TOK_ET, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    $default  reduce using rule 53 (boucleSi)
+    TOK_EQ  shift, and go to state 73
+    TOK_NQ  shift, and go to state 74
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
+
+    $default  reduce using rule 55 (expressionBooleenne)
+
+    Conflict between rule 55 and token TOK_OU resolved as reduce (TOK_OU < TOK_ET).
+    Conflict between rule 55 and token TOK_ET resolved as reduce (%left TOK_ET).
+    Conflict between rule 55 and token TOK_EQ resolved as shift (TOK_ET < TOK_EQ).
+    Conflict between rule 55 and token TOK_NQ resolved as shift (TOK_ET < TOK_NQ).
+    Conflict between rule 55 and token TOK_LT resolved as shift (TOK_ET < TOK_LT).
+    Conflict between rule 55 and token TOK_GT resolved as shift (TOK_ET < TOK_GT).
+    Conflict between rule 55 and token TOK_LE resolved as shift (TOK_ET < TOK_LE).
+    Conflict between rule 55 and token TOK_GE resolved as shift (TOK_ET < TOK_GE).
 
 
 State 104
 
-    2 code: . %empty
-    3     | . code instruction
-    4     | . code error
-   55 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE . code TOK_FINFOR
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   69            | expressionBooleenne TOK_EQ expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    $default  reduce using rule 2 (code)
+    TOK_NQ  shift, and go to state 74
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
 
-    code  go to state 114
+    $default  reduce using rule 69 (comparaison)
+
+    Conflict between rule 69 and token TOK_OU resolved as reduce (TOK_OU < TOK_EQ).
+    Conflict between rule 69 and token TOK_ET resolved as reduce (TOK_ET < TOK_EQ).
+    Conflict between rule 69 and token TOK_EQ resolved as reduce (%left TOK_EQ).
+    Conflict between rule 69 and token TOK_NQ resolved as shift (TOK_EQ < TOK_NQ).
+    Conflict between rule 69 and token TOK_LT resolved as shift (TOK_EQ < TOK_LT).
+    Conflict between rule 69 and token TOK_GT resolved as shift (TOK_EQ < TOK_GT).
+    Conflict between rule 69 and token TOK_LE resolved as shift (TOK_EQ < TOK_LE).
+    Conflict between rule 69 and token TOK_GE resolved as shift (TOK_EQ < TOK_GE).
 
 
 State 105
 
-   16 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR .
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   70            | expressionBooleenne TOK_NQ expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    $default  reduce using rule 16 (lecture)
+    TOK_LT  shift, and go to state 75
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
+
+    $default  reduce using rule 70 (comparaison)
+
+    Conflict between rule 70 and token TOK_OU resolved as reduce (TOK_OU < TOK_NQ).
+    Conflict between rule 70 and token TOK_ET resolved as reduce (TOK_ET < TOK_NQ).
+    Conflict between rule 70 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_NQ).
+    Conflict between rule 70 and token TOK_NQ resolved as reduce (%left TOK_NQ).
+    Conflict between rule 70 and token TOK_LT resolved as shift (TOK_NQ < TOK_LT).
+    Conflict between rule 70 and token TOK_GT resolved as shift (TOK_NQ < TOK_GT).
+    Conflict between rule 70 and token TOK_LE resolved as shift (TOK_NQ < TOK_LE).
+    Conflict between rule 70 and token TOK_GE resolved as shift (TOK_NQ < TOK_GE).
 
 
 State 106
 
-   17 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR .
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   71            | expressionBooleenne TOK_LT expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    $default  reduce using rule 17 (ecriture)
+    TOK_GT  shift, and go to state 76
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
+
+    $default  reduce using rule 71 (comparaison)
+
+    Conflict between rule 71 and token TOK_OU resolved as reduce (TOK_OU < TOK_LT).
+    Conflict between rule 71 and token TOK_ET resolved as reduce (TOK_ET < TOK_LT).
+    Conflict between rule 71 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_LT).
+    Conflict between rule 71 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_LT).
+    Conflict between rule 71 and token TOK_LT resolved as reduce (%left TOK_LT).
+    Conflict between rule 71 and token TOK_GT resolved as shift (TOK_LT < TOK_GT).
+    Conflict between rule 71 and token TOK_LE resolved as shift (TOK_LT < TOK_LE).
+    Conflict between rule 71 and token TOK_GE resolved as shift (TOK_LT < TOK_GE).
 
 
 State 107
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   41         | expressionArithmetique TOK_PLUS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_FINSTR]
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   72            | expressionBooleenne TOK_GT expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    TOK_MUL    shift, and go to state 96
-    TOK_DIV    shift, and go to state 97
-    TOK_PUISS  shift, and go to state 98
+    TOK_LE  shift, and go to state 77
+    TOK_GE  shift, and go to state 78
 
-    $default  reduce using rule 41 (addition)
+    $default  reduce using rule 72 (comparaison)
 
-    Conflict between rule 41 and token TOK_PLUS resolved as reduce (%left TOK_PLUS).
-    Conflict between rule 41 and token TOK_MOINS resolved as reduce (%left TOK_MOINS).
-    Conflict between rule 41 and token TOK_MUL resolved as shift (TOK_PLUS < TOK_MUL).
-    Conflict between rule 41 and token TOK_DIV resolved as shift (TOK_PLUS < TOK_DIV).
-    Conflict between rule 41 and token TOK_PUISS resolved as shift (TOK_PLUS < TOK_PUISS).
+    Conflict between rule 72 and token TOK_OU resolved as reduce (TOK_OU < TOK_GT).
+    Conflict between rule 72 and token TOK_ET resolved as reduce (TOK_ET < TOK_GT).
+    Conflict between rule 72 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_GT).
+    Conflict between rule 72 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_GT).
+    Conflict between rule 72 and token TOK_LT resolved as reduce (TOK_LT < TOK_GT).
+    Conflict between rule 72 and token TOK_GT resolved as reduce (%left TOK_GT).
+    Conflict between rule 72 and token TOK_LE resolved as shift (TOK_GT < TOK_LE).
+    Conflict between rule 72 and token TOK_GE resolved as shift (TOK_GT < TOK_GE).
 
 
 State 108
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   42             | expressionArithmetique TOK_MOINS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_FINSTR]
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   73            | expressionBooleenne TOK_LE expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_LE, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
 
-    TOK_MUL    shift, and go to state 96
-    TOK_DIV    shift, and go to state 97
-    TOK_PUISS  shift, and go to state 98
+    TOK_GE  shift, and go to state 78
 
-    $default  reduce using rule 42 (soustraction)
+    $default  reduce using rule 73 (comparaison)
 
-    Conflict between rule 42 and token TOK_PLUS resolved as reduce (%left TOK_PLUS).
-    Conflict between rule 42 and token TOK_MOINS resolved as reduce (%left TOK_MOINS).
-    Conflict between rule 42 and token TOK_MUL resolved as shift (TOK_MOINS < TOK_MUL).
-    Conflict between rule 42 and token TOK_DIV resolved as shift (TOK_MOINS < TOK_DIV).
-    Conflict between rule 42 and token TOK_PUISS resolved as shift (TOK_MOINS < TOK_PUISS).
+    Conflict between rule 73 and token TOK_OU resolved as reduce (TOK_OU < TOK_LE).
+    Conflict between rule 73 and token TOK_ET resolved as reduce (TOK_ET < TOK_LE).
+    Conflict between rule 73 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_LE).
+    Conflict between rule 73 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_LE).
+    Conflict between rule 73 and token TOK_LT resolved as reduce (TOK_LT < TOK_LE).
+    Conflict between rule 73 and token TOK_GT resolved as reduce (TOK_GT < TOK_LE).
+    Conflict between rule 73 and token TOK_LE resolved as reduce (%left TOK_LE).
+    Conflict between rule 73 and token TOK_GE resolved as shift (TOK_LE < TOK_GE).
 
 
 State 109
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   44               | expressionArithmetique TOK_MUL expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_FINSTR]
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+   55 expressionBooleenne: expressionBooleenne . TOK_ET expressionBooleenne
+   56                    | expressionBooleenne . TOK_OU expressionBooleenne
+   69 comparaison: expressionBooleenne . TOK_EQ expressionBooleenne
+   70            | expressionBooleenne . TOK_NQ expressionBooleenne
+   71            | expressionBooleenne . TOK_LT expressionBooleenne
+   72            | expressionBooleenne . TOK_GT expressionBooleenne
+   73            | expressionBooleenne . TOK_LE expressionBooleenne
+   74            | expressionBooleenne . TOK_GE expressionBooleenne
+   74            | expressionBooleenne TOK_GE expressionBooleenne .  [TOK_OU, TOK_ET, TOK_EQ, TOK_NQ, TOK_LT, TOK_GT, TOK_LE, TOK_GE, TOK_PARD, TOK_FINSTR, TOK_ALORS, TOK_CASE, TOK_FAIRE]
 
-    TOK_PUISS  shift, and go to state 98
+    $default  reduce using rule 74 (comparaison)
 
-    $default  reduce using rule 44 (multiplication)
-
-    Conflict between rule 44 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_MUL).
-    Conflict between rule 44 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_MUL).
-    Conflict between rule 44 and token TOK_MUL resolved as reduce (%left TOK_MUL).
-    Conflict between rule 44 and token TOK_DIV resolved as reduce (%left TOK_DIV).
-    Conflict between rule 44 and token TOK_PUISS resolved as shift (TOK_MUL < TOK_PUISS).
+    Conflict between rule 74 and token TOK_OU resolved as reduce (TOK_OU < TOK_GE).
+    Conflict between rule 74 and token TOK_ET resolved as reduce (TOK_ET < TOK_GE).
+    Conflict between rule 74 and token TOK_EQ resolved as reduce (TOK_EQ < TOK_GE).
+    Conflict between rule 74 and token TOK_NQ resolved as reduce (TOK_NQ < TOK_GE).
+    Conflict between rule 74 and token TOK_LT resolved as reduce (TOK_LT < TOK_GE).
+    Conflict between rule 74 and token TOK_GT resolved as reduce (TOK_GT < TOK_GE).
+    Conflict between rule 74 and token TOK_LE resolved as reduce (TOK_LE < TOK_GE).
+    Conflict between rule 74 and token TOK_GE resolved as reduce (%left TOK_GE).
 
 
 State 110
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   45         | expressionArithmetique TOK_DIV expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_FINSTR]
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   59         | TOK_SI expressionBooleenne TOK_ALORS code . TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   60              | TOK_SI expressionBooleenne TOK_ALORS code . TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
 
-    TOK_PUISS  shift, and go to state 98
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_SINON   shift, and go to state 130
+    TOK_FINSI   shift, and go to state 131
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
 
-    $default  reduce using rule 45 (division)
-
-    Conflict between rule 45 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_DIV).
-    Conflict between rule 45 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_DIV).
-    Conflict between rule 45 and token TOK_MUL resolved as reduce (%left TOK_MUL).
-    Conflict between rule 45 and token TOK_DIV resolved as reduce (%left TOK_DIV).
-    Conflict between rule 45 and token TOK_PUISS resolved as shift (TOK_DIV < TOK_PUISS).
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
 
 
 State 111
 
-   41 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
-   42 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
-   44 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
-   45 division: expressionArithmetique . TOK_DIV expressionArithmetique
-   46 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
-   46          | expressionArithmetique TOK_PUISS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_FINSTR]
+   35 expression: TOK_PARG constantChaine TOK_PARD .
 
-    TOK_PUISS  shift, and go to state 98
-
-    $default  reduce using rule 46 (puissance)
-
-    Conflict between rule 46 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_PUISS).
-    Conflict between rule 46 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_PUISS).
-    Conflict between rule 46 and token TOK_MUL resolved as reduce (TOK_MUL < TOK_PUISS).
-    Conflict between rule 46 and token TOK_DIV resolved as reduce (TOK_DIV < TOK_PUISS).
-    Conflict between rule 46 and token TOK_PUISS resolved as shift (%right TOK_PUISS).
+    $default  reduce using rule 35 (expression)
 
 
 State 112
 
-    2 code: . %empty
-    3     | . code instruction
-    4     | . code error
-   56 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE . code TOK_FINT
+   37 expression: TOK_PARG constantTableau TOK_PARD .
 
-    $default  reduce using rule 2 (code)
-
-    code  go to state 115
+    $default  reduce using rule 37 (expression)
 
 
 State 113
 
-    3 code: code . instruction
-    4     | code . error
-    5 instruction: . declaration
-    6            | . affectation
-    7            | . lecture
-    8            | . ecriture
-    9            | . operationBinaire
-   10            | . boucleSi
-   11            | . boucleSiSinon
-   13            | . bouclePour $@1 boucleTantQue
-   14 declaration: . TOK_TYPE identificateur TOK_FINSTR
-   15 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
-   16 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
-   17 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
-   18 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   53 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   54              | TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code . TOK_FINSI
-   55 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   46 expressionArithmetique: TOK_PARG expressionArithmetique TOK_PARD .
 
-    error       shift, and go to state 5
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
-    TOK_VAR     shift, and go to state 8
-    TOK_TYPE    shift, and go to state 9
-    TOK_BRACKG  shift, and go to state 10
-    TOK_SI      shift, and go to state 12
-    TOK_FINSI   shift, and go to state 116
-    TOK_FOR     shift, and go to state 13
-    TOK_LEER    shift, and go to state 14
-    TOK_ESCRIR  shift, and go to state 15
-
-    instruction           go to state 16
-    declaration           go to state 17
-    affectation           go to state 18
-    lecture               go to state 19
-    ecriture              go to state 20
-    operationBinaire      go to state 21
-    variable              go to state 22
-    identificateur        go to state 23
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    boucleSi              go to state 28
-    boucleSiSinon         go to state 29
-    bouclePour            go to state 30
+    $default  reduce using rule 46 (expressionArithmetique)
 
 
 State 114
 
-    3 code: code . instruction
-    4     | code . error
-    5 instruction: . declaration
-    6            | . affectation
-    7            | . lecture
-    8            | . ecriture
-    9            | . operationBinaire
-   10            | . boucleSi
-   11            | . boucleSiSinon
-   13            | . bouclePour $@1 boucleTantQue
-   14 declaration: . TOK_TYPE identificateur TOK_FINSTR
-   15 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
-   16 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
-   17 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
-   18 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   53 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   55 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
-   55           | TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code . TOK_FINFOR
+   64 case: TOK_CASE constant . TOK_CASEDEF code
 
-    error       shift, and go to state 5
-    TOK_NOMBRE  shift, and go to state 6
-    TOK_STR     shift, and go to state 7
-    TOK_VAR     shift, and go to state 8
-    TOK_TYPE    shift, and go to state 9
-    TOK_BRACKG  shift, and go to state 10
-    TOK_SI      shift, and go to state 12
-    TOK_FOR     shift, and go to state 13
-    TOK_FINFOR  shift, and go to state 117
-    TOK_LEER    shift, and go to state 14
-    TOK_ESCRIR  shift, and go to state 15
-
-    instruction           go to state 16
-    declaration           go to state 17
-    affectation           go to state 18
-    lecture               go to state 19
-    ecriture              go to state 20
-    operationBinaire      go to state 21
-    variable              go to state 22
-    identificateur        go to state 23
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    boucleSi              go to state 28
-    boucleSiSinon         go to state 29
-    bouclePour            go to state 30
+    TOK_CASEDEF  shift, and go to state 132
 
 
 State 115
 
+   65 defaultcase: TOK_DEFAULT . TOK_CASEDEF code
+
+    TOK_CASEDEF  shift, and go to state 133
+
+
+State 116
+
+   61 boucleSwitch: TOK_SWITCH expression cases defaultcase . TOK_FINSWITCH
+
+    TOK_FINSWITCH  shift, and go to state 134
+
+
+State 117
+
+   63 cases: case cases .
+
+    $default  reduce using rule 63 (cases)
+
+
+State 118
+
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   47         | expressionArithmetique TOK_PLUS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_PARD, TOK_FINSTR, TOK_CASE]
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+
+    TOK_MUL    shift, and go to state 91
+    TOK_DIV    shift, and go to state 92
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 47 (addition)
+
+    Conflict between rule 47 and token TOK_PLUS resolved as reduce (%left TOK_PLUS).
+    Conflict between rule 47 and token TOK_MOINS resolved as reduce (%left TOK_MOINS).
+    Conflict between rule 47 and token TOK_MUL resolved as shift (TOK_PLUS < TOK_MUL).
+    Conflict between rule 47 and token TOK_DIV resolved as shift (TOK_PLUS < TOK_DIV).
+    Conflict between rule 47 and token TOK_PUISS resolved as shift (TOK_PLUS < TOK_PUISS).
+
+
+State 119
+
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   48             | expressionArithmetique TOK_MOINS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_PARD, TOK_FINSTR, TOK_CASE]
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+
+    TOK_MUL    shift, and go to state 91
+    TOK_DIV    shift, and go to state 92
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 48 (soustraction)
+
+    Conflict between rule 48 and token TOK_PLUS resolved as reduce (%left TOK_PLUS).
+    Conflict between rule 48 and token TOK_MOINS resolved as reduce (%left TOK_MOINS).
+    Conflict between rule 48 and token TOK_MUL resolved as shift (TOK_MOINS < TOK_MUL).
+    Conflict between rule 48 and token TOK_DIV resolved as shift (TOK_MOINS < TOK_DIV).
+    Conflict between rule 48 and token TOK_PUISS resolved as shift (TOK_MOINS < TOK_PUISS).
+
+
+State 120
+
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   50               | expressionArithmetique TOK_MUL expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_PARD, TOK_FINSTR, TOK_CASE]
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 50 (multiplication)
+
+    Conflict between rule 50 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_MUL).
+    Conflict between rule 50 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_MUL).
+    Conflict between rule 50 and token TOK_MUL resolved as reduce (%left TOK_MUL).
+    Conflict between rule 50 and token TOK_DIV resolved as reduce (%left TOK_DIV).
+    Conflict between rule 50 and token TOK_PUISS resolved as shift (TOK_MUL < TOK_PUISS).
+
+
+State 121
+
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   51         | expressionArithmetique TOK_DIV expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_PARD, TOK_FINSTR, TOK_CASE]
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 51 (division)
+
+    Conflict between rule 51 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_DIV).
+    Conflict between rule 51 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_DIV).
+    Conflict between rule 51 and token TOK_MUL resolved as reduce (%left TOK_MUL).
+    Conflict between rule 51 and token TOK_DIV resolved as reduce (%left TOK_DIV).
+    Conflict between rule 51 and token TOK_PUISS resolved as shift (TOK_DIV < TOK_PUISS).
+
+
+State 122
+
+   47 addition: expressionArithmetique . TOK_PLUS expressionArithmetique
+   48 soustraction: expressionArithmetique . TOK_MOINS expressionArithmetique
+   50 multiplication: expressionArithmetique . TOK_MUL expressionArithmetique
+   51 division: expressionArithmetique . TOK_DIV expressionArithmetique
+   52 puissance: expressionArithmetique . TOK_PUISS expressionArithmetique
+   52          | expressionArithmetique TOK_PUISS expressionArithmetique .  [TOK_PLUS, TOK_MOINS, TOK_MUL, TOK_DIV, TOK_PARD, TOK_FINSTR, TOK_CASE]
+
+    TOK_PUISS  shift, and go to state 93
+
+    $default  reduce using rule 52 (puissance)
+
+    Conflict between rule 52 and token TOK_PLUS resolved as reduce (TOK_PLUS < TOK_PUISS).
+    Conflict between rule 52 and token TOK_MOINS resolved as reduce (TOK_MOINS < TOK_PUISS).
+    Conflict between rule 52 and token TOK_MUL resolved as reduce (TOK_MUL < TOK_PUISS).
+    Conflict between rule 52 and token TOK_DIV resolved as reduce (TOK_DIV < TOK_PUISS).
+    Conflict between rule 52 and token TOK_PUISS resolved as shift (%right TOK_PUISS).
+
+
+State 123
+
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR . variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_BRACKG  shift, and go to state 10
+
+    variable              go to state 135
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+
+
+State 124
+
+   66 bouclePour: TOK_FOR identificateur TOK_DANS variable . TOK_FAIRE code TOK_FINFOR
+
+    TOK_FAIRE  shift, and go to state 136
+
+
+State 125
+
     3 code: code . instruction
     4     | code . error
     5 instruction: . declaration
@@ -2241,25 +2506,30 @@ State 115
     9            | . operationBinaire
    10            | . boucleSi
    11            | . boucleSiSinon
-   13            | . bouclePour $@1 boucleTantQue
-   14 declaration: . TOK_TYPE identificateur TOK_FINSTR
-   15 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
-   16 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
-   17 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
-   18 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
-   19 variable: . identificateur
-   20         | . constant
-   21 identificateur: . TOK_VAR
-   22 constant: . constantArithmetique
-   23         | . constantChaine
-   24         | . constantTableau
-   25 constantArithmetique: . TOK_NOMBRE
-   26 constantChaine: . TOK_STR
-   27 constantTableau: . TOK_BRACKG elements TOK_BRACKD
-   53 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
-   54 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
-   55 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
-   56 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE code . TOK_FINT
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+   68              | TOK_TANT expressionBooleenne TOK_FAIRE code . TOK_FINT
 
     error       shift, and go to state 5
     TOK_NOMBRE  shift, and go to state 6
@@ -2268,44 +2538,566 @@ State 115
     TOK_TYPE    shift, and go to state 9
     TOK_BRACKG  shift, and go to state 10
     TOK_SI      shift, and go to state 12
-    TOK_FOR     shift, and go to state 13
-    TOK_FINT    shift, and go to state 118
-    TOK_LEER    shift, and go to state 14
-    TOK_ESCRIR  shift, and go to state 15
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_FINT    shift, and go to state 137
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
 
-    instruction           go to state 16
-    declaration           go to state 17
-    affectation           go to state 18
-    lecture               go to state 19
-    ecriture              go to state 20
-    operationBinaire      go to state 21
-    variable              go to state 22
-    identificateur        go to state 23
-    constant              go to state 24
-    constantArithmetique  go to state 25
-    constantChaine        go to state 26
-    constantTableau       go to state 27
-    boucleSi              go to state 28
-    boucleSiSinon         go to state 29
-    bouclePour            go to state 30
-
-
-State 116
-
-   54 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI .
-
-    $default  reduce using rule 54 (boucleSiSinon)
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
 
 
-State 117
+State 126
 
-   55 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR .
+   17 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD . TOK_FINSTR
 
-    $default  reduce using rule 55 (bouclePour)
+    TOK_FINSTR  shift, and go to state 138
 
 
-State 118
+State 127
 
-   56 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT .
+   18 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD . TOK_FINSTR
 
-    $default  reduce using rule 56 (boucleTantQue)
+    TOK_FINSTR  shift, and go to state 139
+
+
+State 128
+
+   19 operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR .
+
+    $default  reduce using rule 19 (operationBinaire)
+
+
+State 129
+
+   16 affectation: identificateur TOK_AFFECT expression TOK_FINSTR .
+
+    $default  reduce using rule 16 (affectation)
+
+
+State 130
+
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   60 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON . code TOK_FINSI
+
+    $default  reduce using rule 2 (code)
+
+    code  go to state 140
+
+
+State 131
+
+   59 boucleSi: TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI .
+
+    $default  reduce using rule 59 (boucleSi)
+
+
+State 132
+
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   64 case: TOK_CASE constant TOK_CASEDEF . code
+
+    $default  reduce using rule 2 (code)
+
+    code  go to state 141
+
+
+State 133
+
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   65 defaultcase: TOK_DEFAULT TOK_CASEDEF . code
+
+    $default  reduce using rule 2 (code)
+
+    code  go to state 142
+
+
+State 134
+
+   61 boucleSwitch: TOK_SWITCH expression cases defaultcase TOK_FINSWITCH .
+
+    $default  reduce using rule 61 (boucleSwitch)
+
+
+State 135
+
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable . TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+    TOK_DPTS  shift, and go to state 143
+
+
+State 136
+
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   66 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE . code TOK_FINFOR
+
+    $default  reduce using rule 2 (code)
+
+    code  go to state 144
+
+
+State 137
+
+   68 boucleTantQue: TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT .
+
+    $default  reduce using rule 68 (boucleTantQue)
+
+
+State 138
+
+   17 lecture: TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR .
+
+    $default  reduce using rule 17 (lecture)
+
+
+State 139
+
+   18 ecriture: TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR .
+
+    $default  reduce using rule 18 (ecriture)
+
+
+State 140
+
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   60              | TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code . TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_FINSI   shift, and go to state 145
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
+
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
+
+
+State 141
+
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   64 case: TOK_CASE constant TOK_CASEDEF code .  [TOK_CASE, TOK_DEFAULT]
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
+
+    TOK_CASE     reduce using rule 64 (case)
+    TOK_DEFAULT  reduce using rule 64 (case)
+
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
+
+
+State 142
+
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   65 defaultcase: TOK_DEFAULT TOK_CASEDEF code .  [TOK_FINSWITCH]
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
+
+    TOK_FINSWITCH  reduce using rule 65 (defaultcase)
+
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
+
+
+State 143
+
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS . variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_BRACKG  shift, and go to state 10
+
+    variable              go to state 146
+    identificateur        go to state 37
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+
+
+State 144
+
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   66           | TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code . TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_FINFOR  shift, and go to state 147
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
+
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
+
+
+State 145
+
+   60 boucleSiSinon: TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI .
+
+    $default  reduce using rule 60 (boucleSiSinon)
+
+
+State 146
+
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable . TOK_FERM TOK_FAIRE code TOK_FINFOR
+
+    TOK_FERM  shift, and go to state 148
+
+
+State 147
+
+   66 bouclePour: TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR .
+
+    $default  reduce using rule 66 (bouclePour)
+
+
+State 148
+
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM . TOK_FAIRE code TOK_FINFOR
+
+    TOK_FAIRE  shift, and go to state 149
+
+
+State 149
+
+    2 code: . %empty
+    3     | . code instruction
+    4     | . code error
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE . code TOK_FINFOR
+
+    $default  reduce using rule 2 (code)
+
+    code  go to state 150
+
+
+State 150
+
+    3 code: code . instruction
+    4     | code . error
+    5 instruction: . declaration
+    6            | . affectation
+    7            | . lecture
+    8            | . ecriture
+    9            | . operationBinaire
+   10            | . boucleSi
+   11            | . boucleSiSinon
+   12            | . boucleSwitch
+   13            | . bouclePour
+   14            | . boucleTantQue
+   15 declaration: . TOK_TYPE identificateur TOK_FINSTR
+   16 affectation: . identificateur TOK_AFFECT expression TOK_FINSTR
+   17 lecture: . TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR
+   18 ecriture: . TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR
+   19 operationBinaire: . variable TOK_DECAL expressionArithmetique TOK_FINSTR
+   20 variable: . identificateur
+   21         | . constant
+   22 identificateur: . TOK_VAR
+   23 constant: . constantArithmetique
+   24         | . constantChaine
+   25         | . constantTableau
+   26 constantArithmetique: . TOK_NOMBRE
+   27 constantChaine: . TOK_STR
+   28 constantTableau: . TOK_BRACKG elements TOK_BRACKD
+   59 boucleSi: . TOK_SI expressionBooleenne TOK_ALORS code TOK_FINSI
+   60 boucleSiSinon: . TOK_SI expressionBooleenne TOK_ALORS code TOK_SINON code TOK_FINSI
+   61 boucleSwitch: . TOK_SWITCH expression cases defaultcase TOK_FINSWITCH
+   66 bouclePour: . TOK_FOR identificateur TOK_DANS variable TOK_FAIRE code TOK_FINFOR
+   67           | . TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR
+   67           | TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code . TOK_FINFOR
+   68 boucleTantQue: . TOK_TANT expressionBooleenne TOK_FAIRE code TOK_FINT
+
+    error       shift, and go to state 5
+    TOK_NOMBRE  shift, and go to state 6
+    TOK_STR     shift, and go to state 7
+    TOK_VAR     shift, and go to state 8
+    TOK_TYPE    shift, and go to state 9
+    TOK_BRACKG  shift, and go to state 10
+    TOK_SI      shift, and go to state 12
+    TOK_SWITCH  shift, and go to state 13
+    TOK_FOR     shift, and go to state 14
+    TOK_FINFOR  shift, and go to state 151
+    TOK_TANT    shift, and go to state 15
+    TOK_LEER    shift, and go to state 16
+    TOK_ESCRIR  shift, and go to state 17
+
+    instruction           go to state 18
+    declaration           go to state 19
+    affectation           go to state 20
+    lecture               go to state 21
+    ecriture              go to state 22
+    operationBinaire      go to state 23
+    variable              go to state 24
+    identificateur        go to state 25
+    constant              go to state 26
+    constantArithmetique  go to state 27
+    constantChaine        go to state 28
+    constantTableau       go to state 29
+    boucleSi              go to state 30
+    boucleSiSinon         go to state 31
+    boucleSwitch          go to state 32
+    bouclePour            go to state 33
+    boucleTantQue         go to state 34
+
+
+State 151
+
+   67 bouclePour: TOK_FOR identificateur TOK_DANS TOK_OUVR variable TOK_DPTS variable TOK_FERM TOK_FAIRE code TOK_FINFOR .
+
+    $default  reduce using rule 67 (bouclePour)

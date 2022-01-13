@@ -2,7 +2,7 @@
 %{
 #include "analyzer.h"
 bool error_lexical=false; 
-unsigned int lineno=1;
+
 char * send_error(char *error ,int line);
 %}
 
@@ -16,8 +16,8 @@ blanc [ \t]+
 lettre [a-zA-Z]
 chiffre [0-9]
 nombre {chiffre}+
-signe [-+]
-entier {signe}?{nombre}
+signe [-]
+entier {nombre}
 reel {entier}"."{nombre}
 string1 \"[^\"]*\"
 string2 \'[^\']*\'
@@ -45,14 +45,36 @@ identificateur {lettre}({lettre}|{nombre})*
 %%
 
  /****************************************** Strings ******************************************/
-\"				 		{yy_push_state(string); yymore();}
-<string>[^\"]*\" 		{ yy_pop_state(); yylval.texte = yytext; if(yy_top_state() == if_else || yy_top_state() == while_block ){ return TOK_STR; }else{return TOK_VARB;} }
 
+\"				 		{yy_push_state(string); yymore();}
+<string>[^\"]*\" 		{	yy_pop_state(); 
+							yylval.texte = yytext;
+							return (YY_START==boolean?TOK_VARB:TOK_STR) ;
+						}
+<string>[^\"]*\"/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 		{	yy_pop_state(); 
+																				yylval.texte = yytext;
+																				if(YY_START != boolean){yy_push_state(boolean);}
+																				return TOK_VARB ;
+																			}						
+
+ /****************************************** constants ******************************************/
+
+{entier} {
+			printf(" entier : %s ",yytext) ;
+			yylval.texte = yytext; 
+			return (YY_START == boolean?TOK_VARB:TOK_NOMBRE) ;
+		}		
+
+{entier}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{ 
+																	yylval.texte = yytext;
+																	if(YY_START != boolean){yy_push_state(boolean);}
+																	return TOK_VARB ;
+																}
 
  /****************************************** block_fonctions ******************************************/
  
 (?i:"inicio")/{separateur}+ { return TOK_FINI ; }
-(?i:"finito")/{separateur}+ { return TOK_FINF ; }
+(?i:"finito") { return TOK_FINF ; }
 
  /****************************************** types ******************************************/
 
@@ -65,9 +87,11 @@ identificateur {lettre}({lettre}|{nombre})*
 <if_block>(?i:"contrario")  		{return TOK_SINON ;}
 <if_block,if_else>(?i:"finitosi")	{yy_pop_state(); return TOK_FINSI ; }
 
-(?i:"cambiar")        					  {yy_push_state(matching); return TOK_CAMBIAR ;}
-<matching>(?i:"caso"|"defecto") 		  {yy_push_state(case_block); return TOK_CASE ;}
-<matching,case_block>(?i:"finitocambiar") {yy_pop_state(); return TOK_FINB ;}
+(?i:"cambiar")        			  {yy_push_state(matching); return TOK_SWITCH ;}
+<matching>(?i:"caso") 	    	  {yy_push_state(case_block);  return TOK_CASE ;}
+<matching>(?i:"defecto") 		  {yy_push_state(case_block);  return TOK_DEFAULT ;}
+<case_block>"*"				      {yy_pop_state(); return TOK_CASEDEF ;}
+<matching>(?i:"finitocambiar")	  {yy_pop_state(); return TOK_FINSWITCH ;}
 
  /****************************************** boucles ******************************************/
 
@@ -77,32 +101,32 @@ identificateur {lettre}({lettre}|{nombre})*
 <for_block>(?i:"finitopor") 		{yy_pop_state(); return TOK_FINFOR ;}
 
 (?i:"tanto") 						{yy_push_state(while_block); yy_push_state(boolean); return TOK_TANT ;}
-<boolean>(?i:"darse")       		{return TOK_FAIRE ;}
+<while_block,boolean>(?i:"darse")       		{yy_pop_state(); return TOK_FAIRE ;}
 <while_block>(?i:"finitotanto") 	{yy_pop_state(); return TOK_FINT ;}
 
  /****************************************** E/S ******************************************/
 
 (?i:"leer")/{blanc}*"("{blanc}*{identificateur}    {return TOK_LEER ;}
-(?i:"escrir")/{blanc}*"("{blanc}*{identificateur}  {return TOK_ESCRIR ;}
+(?i:"escrir")/{blanc}*"("{blanc}*  {return TOK_ESCRIR ;}
 
  /****************************************** operateurs arithmetiques ******************************************/
 
-("+")/({blanc}*({identificateur}|{cst})) 		{return TOK_PLUS ; }
-("-")/({blanc}*({identificateur}|{cst})) 		{return TOK_MOINS ;}
-("*")/({blanc}*({identificateur}|{cst})) 		{return TOK_MUL ;}
-("/")/({blanc}*({identificateur}|{cst})) 		{return TOK_DIV ;}
-(?i:"mod")/({blanc}*({identificateur}|{cst})) 	{return TOK_MOD ;}
-("^")/({blanc}*({identificateur}|{cst})) 		{return TOK_PUISS ;}
+("+") 		{return TOK_PLUS ; }
+("-") 		{return TOK_MOINS ;}
+("*") 		{return TOK_MUL ;}
+("/") 		{return TOK_DIV ;}
+(?i:"mod") 	{return TOK_MOD ;}
+("^") 		{return TOK_PUISS ;}
 
  /****************************************** operateurs logiques ******************************************/
 
-(?i:"NAY") 	{if(yy_top_state() != if_else && yy_top_state() != while_block){yy_push_state(boolean);} return TOK_NON ;}
-(?i:"AND") 	{return TOK_ET ;}
-(?i:"OR") 	{return TOK_OU ;}
+(?i:"NAY") 	{ if(YY_START != boolean){yy_push_state(boolean);} return TOK_NON ;}
+<boolean>(?i:"ET") 	{return TOK_ET ;}
+<boolean>(?i:"OU") 	{return TOK_OU ;}
 
  /****************************************** operateurs logiques ******************************************/
  
-"<-" {return TOK_AFFECT ;}
+"<-" { return TOK_AFFECT ;}
 
  /****************************************** operateurs comparaison ******************************************/
 
@@ -116,13 +140,7 @@ identificateur {lettre}({lettre}|{nombre})*
  /****************************************** operateurs decalage ******************************************/
 
 (?i:"DD"|"DG")/{blanc}{nombre}  {return TOK_DECAL ;}
-
- /****************************************** constants ******************************************/
-
-{entier} {yylval.texte = yytext; 
-			if(YYSTATE == boolean){ return TOK_VARB; }else{return TOK_NOMBRE;}
-		 }
-
+						
  /****************************************** ponctuation ******************************************/	
  /*{reel} {yylval.decimal=atof(yytext);	return TOK_NOMBRE;}*/
 
@@ -141,32 +159,26 @@ identificateur {lettre}({lettre}|{nombre})*
 "|" 	{return TOK_PIPE ;}
 ":" 	{return TOK_DPTS ;}
 
-";" 	{if(YY_START == boolean){ yy_pop_state(); } return TOK_FINSTR ;}
+";" 	{ 	if(YY_START == boolean) { yy_pop_state(); }
+			return TOK_FINSTR ;
+		}
 
  /****************************************** identificateurs ******************************************/
 
-{identificateur} {	yylval.texte = yytext; 
-					
-					return (YY_START == boolean?TOK_VARB:TOK_VAR) ;
-				}
-	/*
-	printf(" state = %d",YY_START == boolean);
-	if(YY_START == boolean){ return TOK_VAR; }else{return TOK_VARB;}
-{identificateur}/{blanc}*(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") {yy_push_state(boolean); yylval.texte = yytext; return TOK_VARB ;}
-	*/
+{identificateur}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") {if(YY_START != boolean){yy_push_state(boolean);} yylval.texte = yytext; return TOK_VARB ;}				
+{identificateur} {	yylval.texte = yytext; return (YY_START == boolean?TOK_VARB:TOK_VAR) ;}
 
-
-
+	
  /****************************************** commentaires ******************************************/
 
-"**" 						{yy_push_state(comment);}
+"**" 						{yy_push_state(comment); yymore();}
 <comment>[^"**"]*("**") 	{yy_pop_state(); }
 <comment>[^"**"]*[^"**"] 	{send_error(yytext,yylineno);}
-!!							{yy_push_state(inlin_comm);}
+!!							{yy_push_state(inlin_comm); yymore();}
 <inlin_comm>.*				{yy_pop_state(); }
 
  /****************************************** blanks ******************************************/
-"\n"            {lineno++;}
+"\n"
 {separateur}	;
 
 

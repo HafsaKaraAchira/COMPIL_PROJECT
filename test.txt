@@ -1,7 +1,0 @@
-inicio
-
-si i gt 10 ento
-  i<-5;
-finitosi
-
-finito

@@ -16,7 +16,7 @@
 /* Nous avons la liste de nos tokens (les terminaux de notre grammaire) */
  
 %token                  TOK_FINF                         /* FINITO */
-%token                  TOK_FINB 
+%token                  TOK_FINSWITCH 
 %token<texte>           TOK_NOMBRE
 %token                  TOK_VRAI        /* true */
 %token                  TOK_FAUX        /* false */

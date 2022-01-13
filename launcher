@@ -3,4 +3,4 @@ clear
 flex analyzer_lex.l
 bison -d -rall analyzer_syn.y
 gcc lex.yy.c analyzer_syn.tab.c -lm
-./a.out test.txt
+./a.out program.txt
