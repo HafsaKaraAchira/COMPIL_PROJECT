@@ -110,7 +110,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 12 "analyzer_syn.y"
+#line 24 "analyzer_syn.y"
 
        long nombre;
        char* texte;

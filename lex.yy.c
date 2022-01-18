@@ -1330,7 +1330,7 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 82 "analyzer_lex.l"
-{return TOK_TYPE ; }
+{ yylval.texte = yytext; return TOK_TYPE ; }
 	YY_BREAK
 /****************************************** conditions ******************************************/
 case 9:
@@ -2725,5 +2725,6 @@ char * send_error(char *error ,int line){
 	error_lexical=true ;
 	return error ;
 }
+//gcc `pkg-config --cflags glib-2.0` -I/usr/include/glib-2.0 -I/usr/lib/x-86_64-linux-gnu/glib-2.0/include -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wall -Wextra -g *.c -lglib-2.0 -lm
 
 

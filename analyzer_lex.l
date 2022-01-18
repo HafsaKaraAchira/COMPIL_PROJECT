@@ -78,7 +78,7 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** types ******************************************/
 
-(?i:"global"|"sarta"|"carta"|"entero"|"float"|"etiqueta"|"tablero"|"estrectura") {return TOK_TYPE ; }
+(?i:"global"|"sarta"|"carta"|"entero"|"float"|"etiqueta"|"tablero"|"estrectura") { yylval.texte = yytext; return TOK_TYPE ; }
  
  /****************************************** conditions ******************************************/
 
@@ -199,4 +199,5 @@ char * send_error(char *error ,int line){
 	error_lexical=true ;
 	return error ;
 }
+//gcc `pkg-config --cflags glib-2.0` -I/usr/include/glib-2.0 -I/usr/lib/x-86_64-linux-gnu/glib-2.0/include -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wall -Wextra -g *.c -lglib-2.0 -lm
 

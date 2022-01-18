@@ -146,7 +146,7 @@ Terminals, with rules where they appear
     TOK_STR <texte> (278) 27
     TOK_VAR <texte> (279) 22
     TOK_VARB <texte> (280) 53
-    TOK_TYPE (281) 15
+    TOK_TYPE <texte> (281) 15
     TOK_AFFECT (282) 16
     TOK_OUVR (283) 67
     TOK_FERM (284) 67
