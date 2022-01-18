@@ -1,6 +1,8 @@
 %{
+#include <glib.h>
 #include "analyzer.h"
 bool error_syntaxical=false;
+bool error_semantique=false;
 extern bool error_lexical;
 char *buff;
 extern FILE *yyin ;
