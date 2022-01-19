@@ -52,23 +52,22 @@ identificateur {lettre}({lettre}|{nombre})*
 							return (YY_START==boolean?TOK_VARB:TOK_STR) ;
 						}
 <string>[^\"]*\"/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 		{	yy_pop_state(); 
-																				yylval.texte = yytext;
+																				yylval.texte = (strcmp(yytext,"\"\"") || strspn(yytext,"\r\n\t")==strlen(yytext) ?"false":"true");
 																				if(YY_START != boolean){yy_push_state(boolean);}
-																				return TOK_VARB ;
+																				return TOK_CSTB ;
 																			}						
 
  /****************************************** constants ******************************************/
 
 {entier} {
-			printf(" entier : %s ",yytext) ;
 			yylval.texte = yytext; 
 			return (YY_START == boolean?TOK_VARB:TOK_NOMBRE) ;
 		}		
 
 {entier}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{ 
-																	yylval.texte = yytext;
+																	yylval.texte = (atoi(yytext)?"true":"false") ;
 																	if(YY_START != boolean){yy_push_state(boolean);}
-																	return TOK_VARB ;
+																	return TOK_CSTB ;
 																}
 
  /****************************************** block_fonctions ******************************************/
@@ -78,7 +77,7 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** types ******************************************/
 
-(?i:"global"|"sarta"|"carta"|"entero"|"float"|"etiqueta"|"tablero"|"estrectura") { yylval.texte = yytext; return TOK_TYPE ; }
+(?i:"global"|"sarta"|"carta"|"entero"|"float"|"etiqueta"|"tablero"|"estrectura")/{blanc}+ { yylval.texte = yytext; return TOK_TYPE ; }
  
  /****************************************** conditions ******************************************/
 
@@ -165,7 +164,7 @@ identificateur {lettre}({lettre}|{nombre})*
 
  /****************************************** identificateurs ******************************************/
 
-{identificateur}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") {if(YY_START != boolean){yy_push_state(boolean);} yylval.texte = yytext; return TOK_VARB ;}				
+{identificateur}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") { if(YY_START != boolean){yy_push_state(boolean);} yylval.texte = yytext; return TOK_VARB ;}				
 {identificateur} {	yylval.texte = yytext; return (YY_START == boolean?TOK_VARB:TOK_VAR) ;}
 
 	

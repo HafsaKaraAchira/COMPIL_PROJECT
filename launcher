@@ -3,4 +3,4 @@ clear
 flex analyzer_lex.l
 bison -d -rall analyzer_syn.y
 gcc `pkg-config --cflags glib-2.0` *.c -lm `pkg-config --libs glib-2.0`
-./a.out program.txt
+./a.out test.txt
