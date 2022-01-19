@@ -16,9 +16,31 @@ GHashTable* table_variable;
 typedef struct Variable Variable;
  
 struct Variable{
-        char* type;
-        void* value;
+       char* type;
+       void* value;
 };
+
+typedef struct Quadruple Quadruple;
+
+struct Quadruple{
+       void* arg1;
+       void* arg2;
+       char* result;
+};
+
+Quadruple * table_quadruple;
+
+
+void insertSymbole(char *nom,char *type,void *val);
+bool TypeCompatible(Variable* var,char* type);
+bool VariableCompatible(char* nom,char* type);
+void setValSymbole(char* nom,void* val,char* type);
+void* getValSymbole(char *nom);
+char* getTypeSymbole(char *nom);
+
+void insertQuadr(int id,void * arg1 , void * arg2 , char * result);
+void getQuadr(int id);
+
 %}
 
 
@@ -183,78 +205,30 @@ type: TOK_TYPE{
        };              
 
 declaration:  type identificateur TOK_FINSTR{
-                     Variable* var=malloc(sizeof(Variable));
+                     insertSymbole(strdup($2),strdup($1),NULL);
                      printf("\n\tDecalaration de la variable : ( %s )",$2);
-                     if(var!=NULL){
-                                   var->type=strdup($1);
-                                   var->value=NULL;
-                            if(!g_hash_table_insert(table_variable,strdup($2),var)){
-                                   fprintf(stderr,"ERREUR - PROBLEME CREATION VARIABLE !\n");
-                                   exit(-1);
-                            }
-                     }else{
-                            fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE !\n");
-                            exit(-1);
-                     }
               };
+            
 
 affectation:  identificateur TOK_AFFECT expressionArithmetique TOK_FINSTR{
-                     /* recuperer la valeur et le type de lídentificateur*/
-                     Variable* var=g_hash_table_lookup(table_variable,$1); 
-                     if(var!=NULL){
-                            if(strcmp(var->type,"entero")==0){
-                                   printf("\n\tInstruction type Affectation : Affectation de la valeur arithmetique ( %s ) sur la variable ( %s )",$3,$1);
-                                   var->value=strdup($3);
-                                   g_hash_table_replace(table_variable,strdup($1),var);
-                                   /* $$=strdup($1); */
-                            }else{
-                                   fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Type incompatible de %s(entier attendu - valeur : %s) !\n",$1,(char*)var->value);
-                                   error_semantical=true;
-                            }       
-                     }else{
-                            fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",$1);
-                            error_semantical=true;
-                     }
+                     printf("\n\tInstruction type Affectation : Affectation de la valeur arithmetique ( %s ) sur la variable ( %s )",$3,$1);
+                     setValSymbole(strdup($1),strdup($3),"entero"); 
               }
               |
               identificateur TOK_AFFECT expressionBooleenne TOK_FINSTR{
-                     /* recuperer la valeur et le type de lídentificateur*/
-                     Variable* var=g_hash_table_lookup(table_variable,$1);
-                     /* si elle existe */
-                     if(var!=NULL){
-                            printf("\n\tInstruction type Affectation : Affectation de la valeur booleenne ( %s ) sur la variable ( %s )",$3,$1);
-                            var->value=strdup($3);
-                            g_hash_table_replace(table_variable,strdup($1),var);
-                            /* $$=strdup($1); */     
-                     }else{
-                            fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",$1);
-                            error_semantical=true;
-                     }
+                     printf("\n\tInstruction type Affectation : Affectation de la valeur booleenne ( %s ) sur la variable ( %s )",$3,$1);
+                     setValSymbole(strdup($1),strdup($3),"entero");
               }
               |
               identificateur TOK_AFFECT constantChaine TOK_FINSTR{
-                     /* recuperer la valeur et le type de lídentificateur*/
-                     Variable* var=g_hash_table_lookup(table_variable,$1); 
-                     if(var!=NULL){
-                            if(strcmp(var->type,"sarta")==0){
-                                   printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
-                                   var->value=strdup($3);
-                                   g_hash_table_replace(table_variable,strdup($1),var);
-                                   /* $$=strdup($1); */
-                            }else{
-                                   if(strcmp(var->type,"carta")==0 && strlen($3)==3){
-                                          printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
-                                          var->value=strdup($3);
-                                          g_hash_table_replace(table_variable,strdup($1),var);
-                                   }
-                                   else{
-                                          fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Type incompatible de %s(entier attendu - valeur : %s) !\n",$1,(char*)var->value);
-                                          error_semantical=true;
-                                   }                                          
-                            }       
+                     if(VariableCompatible($1,"sarta")){
+                            printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
+                            setValSymbole(strdup($1),strdup($3),"sarta");
                      }else{
-                            fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",$1);
-                            error_semantical=true;
+                            if(VariableCompatible($1,"sarta") && strlen($3)==3){
+                                   printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
+                                   setValSymbole(strdup($1),strdup($3),"carta");
+                            }                                       
                      }
               }
               ;
@@ -331,18 +305,9 @@ expression:   expressionArithmetique{}
 
 expressionArithmetique: 
        identificateur{
-              Variable* var=g_hash_table_lookup(table_variable,$1);
-              if(var!=NULL){
-                     if(strcmp(var->type,"entero")==0){
-                            $$=strdup($1);
-                     }else{
-                            fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Type incompatible de %s(entier attendu - valeur : %s) !\n",$1,(char*)var->value);
-                            error_semantical=true;
-                     }       
-              }else{
-                     fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",$1);
-                     error_semantical=true;
-              }
+              if(VariableCompatible(strdup($1),"entero")){
+                     $$=strdup($1);
+              }                     
        }
        |
        constantArithmetique{}
@@ -400,40 +365,24 @@ expressionBooleenne: TOK_CSTB{
                             printf("\t\tConstant booleenne : %s",$$);
                      }       
                      |
-                     TOK_VARB{  
-                            printf(" test=%s ",$1);
+                     TOK_VARB{
+                            char* val = getValSymbole($1);
                             regex_t regex;
-                            Variable* var1=g_hash_table_lookup(table_variable,$1);
-                            if(var1 != NULL){
-                                   if( var1->value == NULL ){ var1->value="faux"; $$="faux"; break;}
-
-                                   if( !regcomp(var1->value, "^[0-9]+$", 0) ){
-                                          var1->value=(atoi(var1->value)==0?"faux":"true") ;
-                                          $$ =strdup(var1->value) ;
-                                          break ;
-                                   }
-
-                                   if( !regcomp(var1->value, "^\"*\"$",0) ){
-                                          var1->value=(strcmp(var1->value,"0") ==0 || strcmp(var1->value,"\"\"") ==0?"faux":"true");
-                                          $$ =strdup(var1->value) ;
-                                          break ;
-                                   }
+                            if( val == NULL ){$$="faux";}
+                            else{
+                                   regcomp(&regex, "^[0-9]+$", 0) ;
+                                   int c = regexec(&regex,val, (size_t) 0, NULL, 0);
+                                   if( c ){ 
+                                          $$=(atoi(val)?"vrai":"faux") ; }
                                    else{
-                                          var1->value= "vrai" ; 
-                                          $$ =strdup(var1->value) ;
-                                   }                            
+                                          regcomp(&regex, "^\".*\"$", 0) ;
+                                          c = regexec(&regex,val, (size_t) 0, NULL, 0);
 
-                                   var1->type=strdup("bool");      
-                                   if(!g_hash_table_insert(table_variable,strdup($1),var1)){
-                                          fprintf(stderr,"ERREUR - PROBLEME CREATION VARIABLE !\n");
-                                          exit(-1);
+                                          if( c ){(strndup(val+1,strlen(val)-2)?"vrai":"faux"); }
+                                          else{ $$= "vrai" ; }                            
                                    }
-                                   printf("\t\tVariable booleenne : %s de valeur %s",$1,$$);
-                                   
-                            }else{
-                                   fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",$1);
-                                   error_semantical=true;
                             }
+                            printf("\t\tVariable booleenne : %s == %s",$1,$$);
                      }                          
                      |                                                              
                      TOK_NON expressionBooleenne{
@@ -539,11 +488,98 @@ comparaison:  expressionBooleenne TOK_EQ expressionBooleenne{
 /********************************************/
 
 
+
+void insertSymbole(char *nom,char *type,void *val){
+       Variable* var=malloc(sizeof(Variable));
+       if(var!=NULL){
+              var->type=type;
+              var->value=val;
+              if(!g_hash_table_insert(table_variable,nom,var)){
+                     fprintf(stderr,"ERREUR - PROBLEME CREATION VARIABLE !\n");
+                     exit(-1);
+              }
+       }else{
+              fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE !\n");
+              exit(-1);
+       }
+}
+
+bool TypeCompatible(Variable* var,char* type){
+       return (strcmp(var->type,type)==0) ;
+}
+
+bool VariableCompatible(char* nom,char* type){
+       Variable* var=g_hash_table_lookup(table_variable,nom); 
+       return (TypeCompatible(var,type)) ;
+}
+
+void setValSymbole(char* nom,void* val,char* type){
+       /* recuperer la valeur et le type de lídentificateur*/
+       Variable* var=g_hash_table_lookup(table_variable,nom); 
+       if(var!=NULL){ 
+              if( TypeCompatible(var,type) ){                     
+                     var->value = val ;
+                     g_hash_table_replace(table_variable,nom,var) ;  
+              }      
+              else{
+                     fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Type incompatible ( %s attendu - valeur : %s ) !\n",var->type,(char*)var->value);
+                     error_semantical=true;
+              }  
+       }else{
+              fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",nom);
+              error_semantical=true;
+       }
+}
+
+/*
+void setTypeSymbole(char *nom,char *t){
+       Variable* var=g_hash_table_lookup(table_variable,nom); 
+       if(var!=NULL){ 
+              return var ;                   
+       }else{
+              fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",nom);
+              error_semantical=true;
+       }
+} 
+*/
+
+void* getValSymbole(char *nom){
+        Variable* var=g_hash_table_lookup(table_variable,nom); 
+       if(var!=NULL){ 
+              return var->value ;                   
+       }else{
+              fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",nom);
+              error_semantical=true;
+              return NULL ;
+       }
+}
+
+char* getTypeSymbole(char *nom){
+        Variable* var=g_hash_table_lookup(table_variable,nom); 
+       if(var!=NULL){ 
+              return var->type ;                   
+       }else{
+              fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",nom);
+              error_semantical=true;
+              return NULL ;
+       }
+}
+
+void insertQuadr(int id,void * arg1 , void * arg2 , char * result){
+       
+}
+
+void getQuadr(int id){
+
+}
+
 int main(int argc, char *argv[]){
  	yyin = fopen(argv[1],"r");   
 
        /* Creation de la table de hachage */
-       table_variable=g_hash_table_new_full(g_str_hash,g_str_equal,g_free,g_free);    
+       table_variable=g_hash_table_new(g_str_hash,
+                                          g_str_equal
+                                          );    
 
        printf("Debut de analyse syntaxique :\n\n");
 

@@ -16,7 +16,6 @@ blanc [ \t]+
 lettre [a-zA-Z]
 chiffre [0-9]
 nombre {chiffre}+
-signe [-]
 entier {nombre}
 reel {entier}"."{nombre}
 string1 \"[^\"]*\"
@@ -49,23 +48,35 @@ identificateur {lettre}({lettre}|{nombre})*
 \"				 		{yy_push_state(string); yymore();}
 <string>[^\"]*\" 		{	yy_pop_state(); 
 							yylval.texte = yytext;
-							return (YY_START==boolean?TOK_VARB:TOK_STR) ;
+							if(YY_START == boolean){
+								
+								yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ; 
+								return TOK_CSTB ;
+							}else{
+								yylval.texte = yytext; 
+								return TOK_STR ;
+							}
 						}
-<string>[^\"]*\"/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 		{	yy_pop_state(); 
-																				yylval.texte = (strcmp(yytext,"\"\"") || strspn(yytext,"\r\n\t")==strlen(yytext) ?"false":"true");
-																				if(YY_START != boolean){yy_push_state(boolean);}
-																				return TOK_CSTB ;
-																			}						
+<string>[^\"]*\"/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{	yy_pop_state(); 
+																			yylval.texte = (strndup(yytext+1,strlen(yytext)-2)?"vrai":"faux");
+																			if(YY_START != boolean){yy_push_state(boolean);}
+																			return TOK_CSTB ;
+																		}						
 
  /****************************************** constants ******************************************/
 
 {entier} {
-			yylval.texte = yytext; 
-			return (YY_START == boolean?TOK_VARB:TOK_NOMBRE) ;
+			if(YY_START == boolean){
+				yylval.texte = (atoi(yytext)?"vrai":"faux") ; 
+				return TOK_CSTB ;
+			}else{
+				yylval.texte = yytext; 
+				return TOK_NOMBRE ;
+			}
 		}		
 
 {entier}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{ 
-																	yylval.texte = (atoi(yytext)?"true":"false") ;
+																	yylval.texte = (atoi(yytext)?"vrai":"faux") ;
 																	if(YY_START != boolean){yy_push_state(boolean);}
 																	return TOK_CSTB ;
 																}

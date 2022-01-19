@@ -1,5 +1,7 @@
 inicio
 entero i;
-entero s<-1 ;
-i <- s ou 7 ;
+sarta a;
+a <- "haha" ;
+carta b ;
+i <- b ou 7 ;
 finito
