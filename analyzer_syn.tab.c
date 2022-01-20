@@ -92,12 +92,14 @@ struct Variable{
 typedef struct Quadruple Quadruple;
 
 struct Quadruple{
+       char* op;
        void* arg1;
        void* arg2;
        char* result;
 };
 
-Quadruple * table_quadruple;
+Quadruple **table_quadruple;
+int qc = 0 ;
 
 
 void insertSymbole(char *nom,char *type,void *val);
@@ -107,11 +109,12 @@ void setValSymbole(char* nom,void* val,char* type);
 void* getValSymbole(char *nom);
 char* getTypeSymbole(char *nom);
 
-void insertQuadr(int id,void * arg1 , void * arg2 , char * result);
-void getQuadr(int id);
+int insertQuadr(char* op,void * arg1 , void * arg2 , char * result);
+Quadruple* getQuadr(int id);
+void writeQuadr(int id,Quadruple * quad);
 
 
-#line 115 "analyzer_syn.tab.c"
+#line 118 "analyzer_syn.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -221,12 +224,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 47 "analyzer_syn.y"
+#line 50 "analyzer_syn.y"
 
        long nombre;
        char* texte;
 
-#line 230 "analyzer_syn.tab.c"
+#line 233 "analyzer_syn.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -607,14 +610,14 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   166,   166,   171,   173,   177,   182,   184,   186,   188,
-     190,   192,   194,   196,   198,   200,   203,   207,   213,   218,
-     223,   236,   240,   244,   249,   251,   254,   260,   262,   264,
-     267,   272,   277,   282,   284,   287,   289,   291,   293,   295,
-     299,   301,   307,   313,   315,   317,   319,   321,   323,   325,
-     327,   332,   337,   342,   348,   353,   358,   363,   368,   388,
-     393,   398,   403,   408,   413,   418,   423,   428,   430,   433,
-     438,   442,   446,   451,   455,   460,   465,   470,   475,   480
+       0,   169,   169,   174,   176,   180,   185,   187,   189,   191,
+     193,   195,   197,   199,   201,   203,   206,   210,   216,   222,
+     228,   243,   247,   251,   256,   258,   261,   267,   269,   271,
+     274,   279,   284,   289,   291,   294,   296,   298,   300,   302,
+     306,   308,   314,   320,   322,   324,   326,   328,   330,   332,
+     334,   339,   344,   349,   355,   360,   365,   370,   375,   395,
+     400,   405,   410,   415,   420,   425,   430,   435,   437,   440,
+     445,   449,   453,   458,   462,   467,   472,   477,   482,   487
 };
 #endif
 
@@ -1573,421 +1576,425 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 166 "analyzer_syn.y"
+#line 169 "analyzer_syn.y"
                               {
               printf("\n==================================================================================== Fin du script ====================================================================================\n"); 
        }
-#line 1581 "analyzer_syn.tab.c"
+#line 1584 "analyzer_syn.tab.c"
     break;
 
   case 3:
-#line 171 "analyzer_syn.y"
+#line 174 "analyzer_syn.y"
              {}
-#line 1587 "analyzer_syn.tab.c"
+#line 1590 "analyzer_syn.tab.c"
     break;
 
   case 4:
-#line 173 "analyzer_syn.y"
+#line 176 "analyzer_syn.y"
                        {
               printf("\n------------------------------------- Instruction valide ! --------------------------------------\n\n");
        }
-#line 1595 "analyzer_syn.tab.c"
+#line 1598 "analyzer_syn.tab.c"
     break;
 
   case 5:
-#line 177 "analyzer_syn.y"
+#line 180 "analyzer_syn.y"
                  {
               fprintf(stderr,"\t\t!!!!!!ERREUR : Erreur de syntaxe .\n");
               error_syntaxical=true;
        }
-#line 1604 "analyzer_syn.tab.c"
+#line 1607 "analyzer_syn.tab.c"
     break;
 
   case 6:
-#line 182 "analyzer_syn.y"
+#line 185 "analyzer_syn.y"
                          {}
-#line 1610 "analyzer_syn.tab.c"
+#line 1613 "analyzer_syn.tab.c"
     break;
 
   case 7:
-#line 184 "analyzer_syn.y"
+#line 187 "analyzer_syn.y"
                          {}
-#line 1616 "analyzer_syn.tab.c"
+#line 1619 "analyzer_syn.tab.c"
     break;
 
   case 8:
-#line 186 "analyzer_syn.y"
+#line 189 "analyzer_syn.y"
                      {}
-#line 1622 "analyzer_syn.tab.c"
+#line 1625 "analyzer_syn.tab.c"
     break;
 
   case 9:
-#line 188 "analyzer_syn.y"
+#line 191 "analyzer_syn.y"
                       {}
-#line 1628 "analyzer_syn.tab.c"
+#line 1631 "analyzer_syn.tab.c"
     break;
 
   case 10:
-#line 190 "analyzer_syn.y"
+#line 193 "analyzer_syn.y"
                               {}
-#line 1634 "analyzer_syn.tab.c"
+#line 1637 "analyzer_syn.tab.c"
     break;
 
   case 11:
-#line 192 "analyzer_syn.y"
+#line 195 "analyzer_syn.y"
                       {}
-#line 1640 "analyzer_syn.tab.c"
+#line 1643 "analyzer_syn.tab.c"
     break;
 
   case 12:
-#line 194 "analyzer_syn.y"
+#line 197 "analyzer_syn.y"
                            {}
-#line 1646 "analyzer_syn.tab.c"
+#line 1649 "analyzer_syn.tab.c"
     break;
 
   case 13:
-#line 196 "analyzer_syn.y"
+#line 199 "analyzer_syn.y"
                           {}
-#line 1652 "analyzer_syn.tab.c"
+#line 1655 "analyzer_syn.tab.c"
     break;
 
   case 14:
-#line 198 "analyzer_syn.y"
+#line 201 "analyzer_syn.y"
                         {}
-#line 1658 "analyzer_syn.tab.c"
+#line 1661 "analyzer_syn.tab.c"
     break;
 
   case 15:
-#line 200 "analyzer_syn.y"
+#line 203 "analyzer_syn.y"
                            {}
-#line 1664 "analyzer_syn.tab.c"
+#line 1667 "analyzer_syn.tab.c"
     break;
 
   case 16:
-#line 203 "analyzer_syn.y"
+#line 206 "analyzer_syn.y"
               {
               (yyval.texte)=strdup((yyvsp[0].texte));
        }
-#line 1672 "analyzer_syn.tab.c"
+#line 1675 "analyzer_syn.tab.c"
     break;
 
   case 17:
-#line 207 "analyzer_syn.y"
+#line 210 "analyzer_syn.y"
                                             {
                      insertSymbole(strdup((yyvsp[-1].texte)),strdup((yyvsp[-2].texte)),NULL);
                      printf("\n\tDecalaration de la variable : ( %s )",(yyvsp[-1].texte));
               }
-#line 1681 "analyzer_syn.tab.c"
+#line 1684 "analyzer_syn.tab.c"
     break;
 
   case 18:
-#line 213 "analyzer_syn.y"
+#line 216 "analyzer_syn.y"
                                                                          {
                      printf("\n\tInstruction type Affectation : Affectation de la valeur arithmetique ( %s ) sur la variable ( %s )",(yyvsp[-1].texte),(yyvsp[-3].texte));
                      setValSymbole(strdup((yyvsp[-3].texte)),strdup((yyvsp[-1].texte)),"entero"); 
+                     insertQuadr(strdup("<-"),strdup((yyvsp[-1].texte)),strdup("_"),strdup((yyvsp[-3].texte)));
               }
-#line 1690 "analyzer_syn.tab.c"
+#line 1694 "analyzer_syn.tab.c"
     break;
 
   case 19:
-#line 218 "analyzer_syn.y"
+#line 222 "analyzer_syn.y"
                                                                       {
                      printf("\n\tInstruction type Affectation : Affectation de la valeur booleenne ( %s ) sur la variable ( %s )",(yyvsp[-1].texte),(yyvsp[-3].texte));
                      setValSymbole(strdup((yyvsp[-3].texte)),strdup((yyvsp[-1].texte)),"entero");
+                     insertQuadr(strdup("<-"),strdup((yyvsp[-1].texte)),strdup("_"),strdup((yyvsp[-3].texte)));
               }
-#line 1699 "analyzer_syn.tab.c"
+#line 1704 "analyzer_syn.tab.c"
     break;
 
   case 20:
-#line 223 "analyzer_syn.y"
+#line 228 "analyzer_syn.y"
                                                                  {
                      if(VariableCompatible((yyvsp[-3].texte),"sarta")){
                             printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",(yyvsp[-1].texte),(yyvsp[-3].texte));
                             setValSymbole(strdup((yyvsp[-3].texte)),strdup((yyvsp[-1].texte)),"sarta");
+                            insertQuadr(strdup("<-"),strdup((yyvsp[-1].texte)),strdup("_"),strdup((yyvsp[-3].texte)));
                      }else{
-                            if(VariableCompatible((yyvsp[-3].texte),"sarta") && strlen((yyvsp[-1].texte))==3){
+                            if(VariableCompatible((yyvsp[-3].texte),"carta") && strlen((yyvsp[-1].texte))==3){
                                    printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",(yyvsp[-1].texte),(yyvsp[-3].texte));
                                    setValSymbole(strdup((yyvsp[-3].texte)),strdup((yyvsp[-1].texte)),"carta");
+                                   insertQuadr(strdup("<-"),strdup((yyvsp[-1].texte)),strdup("_"),strdup((yyvsp[-3].texte)));
                             }                                       
                      }
               }
-#line 1715 "analyzer_syn.tab.c"
+#line 1722 "analyzer_syn.tab.c"
     break;
 
   case 21:
-#line 236 "analyzer_syn.y"
+#line 243 "analyzer_syn.y"
                                                                   {
                      printf("\n\tInstruction type Lecture : lire dans la variable ( %s )",(yyvsp[-2].texte));
               }
-#line 1723 "analyzer_syn.tab.c"
+#line 1730 "analyzer_syn.tab.c"
     break;
 
   case 22:
-#line 240 "analyzer_syn.y"
+#line 247 "analyzer_syn.y"
                                                               {
                      printf("\n\tInstruction type Ecriture :ecrire la valeur de ( %s )",(yyvsp[-2].texte));
               }
-#line 1731 "analyzer_syn.tab.c"
+#line 1738 "analyzer_syn.tab.c"
     break;
 
   case 23:
-#line 244 "analyzer_syn.y"
+#line 251 "analyzer_syn.y"
                                                                       {
                      printf("\n\t\tOperation binaire");
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-3].texte)),strdup("DECAL")),strdup((yyvsp[-1].texte)));
               }
-#line 1740 "analyzer_syn.tab.c"
+#line 1747 "analyzer_syn.tab.c"
     break;
 
   case 24:
-#line 249 "analyzer_syn.y"
+#line 256 "analyzer_syn.y"
                             {}
-#line 1746 "analyzer_syn.tab.c"
+#line 1753 "analyzer_syn.tab.c"
     break;
 
   case 25:
-#line 251 "analyzer_syn.y"
+#line 258 "analyzer_syn.y"
                       {}
-#line 1752 "analyzer_syn.tab.c"
+#line 1759 "analyzer_syn.tab.c"
     break;
 
   case 26:
-#line 254 "analyzer_syn.y"
+#line 261 "analyzer_syn.y"
                            {
                      printf("\t\tVariable : %s",(yyvsp[0].texte));                           
                      (yyval.texte)=strdup((yyvsp[0].texte));
               }
-#line 1761 "analyzer_syn.tab.c"
+#line 1768 "analyzer_syn.tab.c"
     break;
 
   case 27:
-#line 260 "analyzer_syn.y"
+#line 267 "analyzer_syn.y"
                                   {       (yyval.texte)=strdup((yyvsp[0].texte));}
-#line 1767 "analyzer_syn.tab.c"
+#line 1774 "analyzer_syn.tab.c"
     break;
 
   case 28:
-#line 262 "analyzer_syn.y"
+#line 269 "analyzer_syn.y"
                             {       (yyval.texte)=strdup((yyvsp[0].texte));}
-#line 1773 "analyzer_syn.tab.c"
+#line 1780 "analyzer_syn.tab.c"
     break;
 
   case 29:
-#line 264 "analyzer_syn.y"
+#line 271 "analyzer_syn.y"
                              {       (yyval.texte)=strdup((yyvsp[0].texte));}
-#line 1779 "analyzer_syn.tab.c"
+#line 1786 "analyzer_syn.tab.c"
     break;
 
   case 30:
-#line 267 "analyzer_syn.y"
+#line 274 "analyzer_syn.y"
                                  {
                             printf("\t\tConstant arithmetique : %s",(yyvsp[0].texte));
                             (yyval.texte)=strdup((yyvsp[0].texte));
                      }
-#line 1788 "analyzer_syn.tab.c"
+#line 1795 "analyzer_syn.tab.c"
     break;
 
   case 31:
-#line 272 "analyzer_syn.y"
+#line 279 "analyzer_syn.y"
                        {
                      printf("\t\tConstant Chaines : %s",(yyvsp[0].texte));
                      (yyval.texte)=strdup((yyvsp[0].texte));
               }
-#line 1797 "analyzer_syn.tab.c"
+#line 1804 "analyzer_syn.tab.c"
     break;
 
   case 32:
-#line 277 "analyzer_syn.y"
+#line 284 "analyzer_syn.y"
                                                {
                      (yyval.texte)=strcat(strcat(strdup("["),strdup((yyvsp[-1].texte))),strdup("]"));
                      printf("\t\tConstant tableau : %s",(yyval.texte));
               }
-#line 1806 "analyzer_syn.tab.c"
+#line 1813 "analyzer_syn.tab.c"
     break;
 
   case 33:
-#line 282 "analyzer_syn.y"
+#line 289 "analyzer_syn.y"
                                    {       (yyval.texte)=strcat( strcat( strdup((yyvsp[-2].texte)) , strdup(",") ) , strdup((yyvsp[0].texte)) ) ;}
-#line 1812 "analyzer_syn.tab.c"
+#line 1819 "analyzer_syn.tab.c"
     break;
 
   case 34:
-#line 284 "analyzer_syn.y"
+#line 291 "analyzer_syn.y"
               {       (yyval.texte)=strdup((yyvsp[0].texte));}
-#line 1818 "analyzer_syn.tab.c"
+#line 1825 "analyzer_syn.tab.c"
     break;
 
   case 35:
-#line 287 "analyzer_syn.y"
+#line 294 "analyzer_syn.y"
                 {}
-#line 1824 "analyzer_syn.tab.c"
+#line 1831 "analyzer_syn.tab.c"
     break;
 
   case 36:
-#line 289 "analyzer_syn.y"
+#line 296 "analyzer_syn.y"
                                     {}
-#line 1830 "analyzer_syn.tab.c"
+#line 1837 "analyzer_syn.tab.c"
     break;
 
   case 37:
-#line 291 "analyzer_syn.y"
+#line 298 "analyzer_syn.y"
                                  {}
-#line 1836 "analyzer_syn.tab.c"
+#line 1843 "analyzer_syn.tab.c"
     break;
 
   case 38:
-#line 293 "analyzer_syn.y"
+#line 300 "analyzer_syn.y"
                             {}
-#line 1842 "analyzer_syn.tab.c"
+#line 1849 "analyzer_syn.tab.c"
     break;
 
   case 39:
-#line 295 "analyzer_syn.y"
+#line 302 "analyzer_syn.y"
                                               {
                     (yyval.texte)=strcat(strcat(strdup("("),strdup((yyvsp[-1].texte))),strdup(")"));
               }
-#line 1850 "analyzer_syn.tab.c"
+#line 1857 "analyzer_syn.tab.c"
     break;
 
   case 40:
-#line 299 "analyzer_syn.y"
+#line 306 "analyzer_syn.y"
                              {}
-#line 1856 "analyzer_syn.tab.c"
+#line 1863 "analyzer_syn.tab.c"
     break;
 
   case 41:
-#line 301 "analyzer_syn.y"
+#line 308 "analyzer_syn.y"
                                                {
                     (yyval.texte)=strcat(strcat(strdup("("),strdup((yyvsp[-1].texte))),strdup(")"));
               }
-#line 1864 "analyzer_syn.tab.c"
+#line 1871 "analyzer_syn.tab.c"
     break;
 
   case 42:
-#line 307 "analyzer_syn.y"
+#line 314 "analyzer_syn.y"
                      {
               if(VariableCompatible(strdup((yyvsp[0].texte)),"entero")){
                      (yyval.texte)=strdup((yyvsp[0].texte));
               }                     
        }
-#line 1874 "analyzer_syn.tab.c"
+#line 1881 "analyzer_syn.tab.c"
     break;
 
   case 43:
-#line 313 "analyzer_syn.y"
+#line 320 "analyzer_syn.y"
                            {}
-#line 1880 "analyzer_syn.tab.c"
+#line 1887 "analyzer_syn.tab.c"
     break;
 
   case 44:
-#line 315 "analyzer_syn.y"
+#line 322 "analyzer_syn.y"
                {}
-#line 1886 "analyzer_syn.tab.c"
+#line 1893 "analyzer_syn.tab.c"
     break;
 
   case 45:
-#line 317 "analyzer_syn.y"
+#line 324 "analyzer_syn.y"
                    {}
-#line 1892 "analyzer_syn.tab.c"
+#line 1899 "analyzer_syn.tab.c"
     break;
 
   case 46:
-#line 319 "analyzer_syn.y"
+#line 326 "analyzer_syn.y"
                      {}
-#line 1898 "analyzer_syn.tab.c"
+#line 1905 "analyzer_syn.tab.c"
     break;
 
   case 47:
-#line 321 "analyzer_syn.y"
+#line 328 "analyzer_syn.y"
                      {}
-#line 1904 "analyzer_syn.tab.c"
+#line 1911 "analyzer_syn.tab.c"
     break;
 
   case 48:
-#line 323 "analyzer_syn.y"
+#line 330 "analyzer_syn.y"
                {}
-#line 1910 "analyzer_syn.tab.c"
+#line 1917 "analyzer_syn.tab.c"
     break;
 
   case 49:
-#line 325 "analyzer_syn.y"
+#line 332 "analyzer_syn.y"
                 {}
-#line 1916 "analyzer_syn.tab.c"
+#line 1923 "analyzer_syn.tab.c"
     break;
 
   case 50:
-#line 327 "analyzer_syn.y"
+#line 334 "analyzer_syn.y"
                                                {
               (yyval.texte)=strcat(strcat(strdup("("),strdup((yyvsp[-1].texte))),strdup(")"));
        }
-#line 1924 "analyzer_syn.tab.c"
+#line 1931 "analyzer_syn.tab.c"
     break;
 
   case 51:
-#line 332 "analyzer_syn.y"
+#line 339 "analyzer_syn.y"
                                                                     {      
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup("+")),strdup((yyvsp[0].texte)));
                      printf("\t\tAddition %s",(yyval.texte));
               }
-#line 1933 "analyzer_syn.tab.c"
+#line 1940 "analyzer_syn.tab.c"
     break;
 
   case 52:
-#line 337 "analyzer_syn.y"
+#line 344 "analyzer_syn.y"
                                                                      {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup("-")),strdup((yyvsp[0].texte)));
                      printf("\t\tSoustraction %s",(yyval.texte));
               }
-#line 1942 "analyzer_syn.tab.c"
+#line 1949 "analyzer_syn.tab.c"
     break;
 
   case 53:
-#line 342 "analyzer_syn.y"
+#line 349 "analyzer_syn.y"
                                                                {
                             (yyval.texte)=strcat(strdup("-"),strdup((yyvsp[0].texte)));
                             printf("\t\tInversion du signe %s",(yyval.texte));
                      }
-#line 1951 "analyzer_syn.tab.c"
+#line 1958 "analyzer_syn.tab.c"
     break;
 
   case 54:
-#line 348 "analyzer_syn.y"
+#line 355 "analyzer_syn.y"
                                                                           {
                             (yyval.texte)= strcat(strcat(strdup((yyvsp[-2].texte)),strdup("*")),strdup((yyvsp[0].texte)));
                             printf("\t\tMultiplication %s",(yyval.texte));
                      }
-#line 1960 "analyzer_syn.tab.c"
+#line 1967 "analyzer_syn.tab.c"
     break;
 
   case 55:
-#line 353 "analyzer_syn.y"
+#line 360 "analyzer_syn.y"
                                                                    {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup("/")),strdup((yyvsp[0].texte)));
                      printf("\t\tDivision %s",(yyval.texte));
               }
-#line 1969 "analyzer_syn.tab.c"
+#line 1976 "analyzer_syn.tab.c"
     break;
 
   case 56:
-#line 358 "analyzer_syn.y"
+#line 365 "analyzer_syn.y"
                                                                      {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup("^")),strdup((yyvsp[0].texte)));
                      printf("\t\tPuissance %s",(yyval.texte));
               }
-#line 1978 "analyzer_syn.tab.c"
+#line 1985 "analyzer_syn.tab.c"
     break;
 
   case 57:
-#line 363 "analyzer_syn.y"
+#line 370 "analyzer_syn.y"
                              {
                             (yyval.texte)=strdup((yyvsp[0].texte));
                             printf("\t\tConstant booleenne : %s",(yyval.texte));
                      }
-#line 1987 "analyzer_syn.tab.c"
+#line 1994 "analyzer_syn.tab.c"
     break;
 
   case 58:
-#line 368 "analyzer_syn.y"
+#line 375 "analyzer_syn.y"
                              {
                             char* val = getValSymbole((yyvsp[0].texte));
                             regex_t regex;
@@ -2007,185 +2014,185 @@ yyreduce:
                             }
                             printf("\t\tVariable booleenne : %s == %s",(yyvsp[0].texte),(yyval.texte));
                      }
-#line 2011 "analyzer_syn.tab.c"
+#line 2018 "analyzer_syn.tab.c"
     break;
 
   case 59:
-#line 388 "analyzer_syn.y"
+#line 395 "analyzer_syn.y"
                                                 {
                             (yyval.texte)=strncat(strdup("non "),strdup((yyvsp[0].texte)),2*strlen((yyvsp[0].texte)));
                             printf("\t\tOperation booleenne : %s \n",(yyval.texte));
                      }
-#line 2020 "analyzer_syn.tab.c"
+#line 2027 "analyzer_syn.tab.c"
     break;
 
   case 60:
-#line 393 "analyzer_syn.y"
+#line 400 "analyzer_syn.y"
                                                                    {
                             (yyval.texte)=strncat(strcat(strdup((yyvsp[-2].texte)),strdup(" et ")),strdup((yyvsp[0].texte)),2*strlen((yyvsp[-2].texte))+2*strlen((yyvsp[0].texte)));
                             printf("\t\tOperation booleenne : %s \n",(yyval.texte));
                      }
-#line 2029 "analyzer_syn.tab.c"
+#line 2036 "analyzer_syn.tab.c"
     break;
 
   case 61:
-#line 398 "analyzer_syn.y"
+#line 405 "analyzer_syn.y"
                                                                    {
                             (yyval.texte)=strncat(strcat(strdup((yyvsp[-2].texte)),strdup(" ou ")),strdup((yyvsp[0].texte)),2*strlen((yyvsp[-2].texte))+2*strlen((yyvsp[0].texte)));
                             printf("\t\tOperation booleenne : %s \n",(yyval.texte));
                      }
-#line 2038 "analyzer_syn.tab.c"
+#line 2045 "analyzer_syn.tab.c"
     break;
 
   case 62:
-#line 403 "analyzer_syn.y"
+#line 410 "analyzer_syn.y"
                                                           {
                             (yyval.texte)=strcat(strcat(strdup("("),strdup((yyvsp[-1].texte))),strdup(")"));
                             printf("\t\tOperation booleenne entre parenteses : %s \n",(yyval.texte));
                      }
-#line 2047 "analyzer_syn.tab.c"
+#line 2054 "analyzer_syn.tab.c"
     break;
 
   case 63:
-#line 408 "analyzer_syn.y"
+#line 415 "analyzer_syn.y"
                                 {
                             (yyval.texte)=strdup((yyvsp[0].texte));
                      }
-#line 2055 "analyzer_syn.tab.c"
+#line 2062 "analyzer_syn.tab.c"
     break;
 
   case 64:
-#line 413 "analyzer_syn.y"
+#line 420 "analyzer_syn.y"
                                                                  {
                      printf("\tBLock SI");
               }
-#line 2063 "analyzer_syn.tab.c"
+#line 2070 "analyzer_syn.tab.c"
     break;
 
   case 65:
-#line 418 "analyzer_syn.y"
+#line 425 "analyzer_syn.y"
                                                                                  {
                      printf("\tBLock SI_SINON");
               }
-#line 2071 "analyzer_syn.tab.c"
+#line 2078 "analyzer_syn.tab.c"
     break;
 
   case 66:
-#line 423 "analyzer_syn.y"
+#line 430 "analyzer_syn.y"
                                                                    {
                      printf("\tBLock SWITCH sur expression %s\n",(yyvsp[-3].texte));
               }
-#line 2079 "analyzer_syn.tab.c"
+#line 2086 "analyzer_syn.tab.c"
     break;
 
   case 67:
-#line 428 "analyzer_syn.y"
+#line 435 "analyzer_syn.y"
                    {}
-#line 2085 "analyzer_syn.tab.c"
+#line 2092 "analyzer_syn.tab.c"
     break;
 
   case 68:
-#line 430 "analyzer_syn.y"
+#line 437 "analyzer_syn.y"
                          {}
-#line 2091 "analyzer_syn.tab.c"
+#line 2098 "analyzer_syn.tab.c"
     break;
 
   case 69:
-#line 433 "analyzer_syn.y"
+#line 440 "analyzer_syn.y"
                                                 {
                      printf("\tcas d evaluation == %s\n",(yyvsp[-2].texte));
               }
-#line 2099 "analyzer_syn.tab.c"
+#line 2106 "analyzer_syn.tab.c"
     break;
 
   case 70:
-#line 438 "analyzer_syn.y"
+#line 445 "analyzer_syn.y"
                                           {
                      printf("\tcas d evaluation par defaut\n");
               }
-#line 2107 "analyzer_syn.tab.c"
+#line 2114 "analyzer_syn.tab.c"
     break;
 
   case 71:
-#line 442 "analyzer_syn.y"
+#line 449 "analyzer_syn.y"
                                                                                 {
                      printf("\tBLock POUR");
               }
-#line 2115 "analyzer_syn.tab.c"
+#line 2122 "analyzer_syn.tab.c"
     break;
 
   case 72:
-#line 446 "analyzer_syn.y"
+#line 453 "analyzer_syn.y"
                                                                                                                      {
                      printf("\tBLock POUR");
               }
-#line 2123 "analyzer_syn.tab.c"
+#line 2130 "analyzer_syn.tab.c"
     break;
 
   case 73:
-#line 451 "analyzer_syn.y"
+#line 458 "analyzer_syn.y"
                                                                     {
                      printf("\tBLock TANTQUE");
               }
-#line 2131 "analyzer_syn.tab.c"
+#line 2138 "analyzer_syn.tab.c"
     break;
 
   case 74:
-#line 455 "analyzer_syn.y"
+#line 462 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" == ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s == %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2140 "analyzer_syn.tab.c"
+#line 2147 "analyzer_syn.tab.c"
     break;
 
   case 75:
-#line 460 "analyzer_syn.y"
+#line 467 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" != ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s != %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2149 "analyzer_syn.tab.c"
+#line 2156 "analyzer_syn.tab.c"
     break;
 
   case 76:
-#line 465 "analyzer_syn.y"
+#line 472 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" < ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s < %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2158 "analyzer_syn.tab.c"
+#line 2165 "analyzer_syn.tab.c"
     break;
 
   case 77:
-#line 470 "analyzer_syn.y"
+#line 477 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" > ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s > %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2167 "analyzer_syn.tab.c"
+#line 2174 "analyzer_syn.tab.c"
     break;
 
   case 78:
-#line 475 "analyzer_syn.y"
+#line 482 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" <= ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s <= %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2176 "analyzer_syn.tab.c"
+#line 2183 "analyzer_syn.tab.c"
     break;
 
   case 79:
-#line 480 "analyzer_syn.y"
+#line 487 "analyzer_syn.y"
                                                             {
                      (yyval.texte)=strcat(strcat(strdup((yyvsp[-2].texte)),strdup(" >= ")),strdup((yyvsp[0].texte)));
                      printf("\n\t\tComparaison : %s >= %s",(yyvsp[-2].texte),(yyvsp[0].texte));
               }
-#line 2185 "analyzer_syn.tab.c"
+#line 2192 "analyzer_syn.tab.c"
     break;
 
 
-#line 2189 "analyzer_syn.tab.c"
+#line 2196 "analyzer_syn.tab.c"
 
       default: break;
     }
@@ -2417,7 +2424,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 486 "analyzer_syn.y"
+#line 493 "analyzer_syn.y"
 
 
 /********************************************/
@@ -2490,7 +2497,7 @@ void* getValSymbole(char *nom){
 }
 
 char* getTypeSymbole(char *nom){
-        Variable* var=g_hash_table_lookup(table_variable,nom); 
+       Variable* var=g_hash_table_lookup(table_variable,nom); 
        if(var!=NULL){ 
               return var->type ;                   
        }else{
@@ -2500,16 +2507,37 @@ char* getTypeSymbole(char *nom){
        }
 }
 
-void insertQuadr(int id,void * arg1 , void * arg2 , char * result){
-       
+int insertQuadr(char* op,void * arg1 , void * arg2 , char* result){
+       Quadruple* quad=malloc(sizeof(Quadruple));
+       if(quad!=NULL){
+              quad->op=op;
+              quad->arg1=arg1;
+              quad->arg2=arg2;
+              quad->result=result;
+              /* printf("\n test \n") ;*/
+              table_quadruple[qc] = quad ;
+              writeQuadr(qc,quad);
+              return qc++;
+       }else{
+              fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE !\n");
+              /* exit(-1);*/
+       }
 }
 
-void getQuadr(int id){
+void writeQuadr(int id,Quadruple * quad){
+       if (yyout != NULL){
+              fprintf(yyout,"@%d ( %s , %s , %s , %s )\n",id,quad->op,(char*)quad->arg1,(char*)quad->arg2,quad->result);
+       }
+}
 
+Quadruple* getQuadr(int id){
+      return (table_quadruple[id]); 
 }
 
 int main(int argc, char *argv[]){
- 	yyin = fopen(argv[1],"r");   
+ 	yyin = fopen(argv[1],"r");      
+       yyout = fopen("code_genere.txt","w");  
+       table_quadruple = malloc(100*sizeof(Quadruple*)); 
 
        /* Creation de la table de hachage */
        table_variable=g_hash_table_new(g_str_hash,
@@ -2537,6 +2565,8 @@ int main(int argc, char *argv[]){
 
        /* Liberation memoire : suppression de la table */
        /* g_hash_table_destroy(table_variable);*/
+       
+       fclose(yyout);
        return EXIT_SUCCESS;
 }
 

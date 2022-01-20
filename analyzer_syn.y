@@ -23,12 +23,14 @@ struct Variable{
 typedef struct Quadruple Quadruple;
 
 struct Quadruple{
+       char* op;
        void* arg1;
        void* arg2;
        char* result;
 };
 
-Quadruple * table_quadruple;
+Quadruple **table_quadruple;
+int qc = 0 ;
 
 
 void insertSymbole(char *nom,char *type,void *val);
@@ -38,8 +40,9 @@ void setValSymbole(char* nom,void* val,char* type);
 void* getValSymbole(char *nom);
 char* getTypeSymbole(char *nom);
 
-void insertQuadr(int id,void * arg1 , void * arg2 , char * result);
-void getQuadr(int id);
+int insertQuadr(char* op,void * arg1 , void * arg2 , char * result);
+Quadruple* getQuadr(int id);
+void writeQuadr(int id,Quadruple * quad);
 
 %}
 
@@ -213,21 +216,25 @@ declaration:  type identificateur TOK_FINSTR{
 affectation:  identificateur TOK_AFFECT expressionArithmetique TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur arithmetique ( %s ) sur la variable ( %s )",$3,$1);
                      setValSymbole(strdup($1),strdup($3),"entero"); 
+                     insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
               }
               |
               identificateur TOK_AFFECT expressionBooleenne TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur booleenne ( %s ) sur la variable ( %s )",$3,$1);
                      setValSymbole(strdup($1),strdup($3),"entero");
+                     insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
               }
               |
               identificateur TOK_AFFECT constantChaine TOK_FINSTR{
                      if(VariableCompatible($1,"sarta")){
                             printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
                             setValSymbole(strdup($1),strdup($3),"sarta");
+                            insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
                      }else{
-                            if(VariableCompatible($1,"sarta") && strlen($3)==3){
+                            if(VariableCompatible($1,"carta") && strlen($3)==3){
                                    printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
                                    setValSymbole(strdup($1),strdup($3),"carta");
+                                   insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
                             }                                       
                      }
               }
@@ -555,7 +562,7 @@ void* getValSymbole(char *nom){
 }
 
 char* getTypeSymbole(char *nom){
-        Variable* var=g_hash_table_lookup(table_variable,nom); 
+       Variable* var=g_hash_table_lookup(table_variable,nom); 
        if(var!=NULL){ 
               return var->type ;                   
        }else{
@@ -565,16 +572,37 @@ char* getTypeSymbole(char *nom){
        }
 }
 
-void insertQuadr(int id,void * arg1 , void * arg2 , char * result){
-       
+int insertQuadr(char* op,void * arg1 , void * arg2 , char* result){
+       Quadruple* quad=malloc(sizeof(Quadruple));
+       if(quad!=NULL){
+              quad->op=op;
+              quad->arg1=arg1;
+              quad->arg2=arg2;
+              quad->result=result;
+              /* printf("\n test \n") ;*/
+              table_quadruple[qc] = quad ;
+              writeQuadr(qc,quad);
+              return qc++;
+       }else{
+              fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE !\n");
+              /* exit(-1);*/
+       }
 }
 
-void getQuadr(int id){
+void writeQuadr(int id,Quadruple * quad){
+       if (yyout != NULL){
+              fprintf(yyout,"@%d ( %s , %s , %s , %s )\n",id,quad->op,(char*)quad->arg1,(char*)quad->arg2,quad->result);
+       }
+}
 
+Quadruple* getQuadr(int id){
+      return (table_quadruple[id]); 
 }
 
 int main(int argc, char *argv[]){
- 	yyin = fopen(argv[1],"r");   
+ 	yyin = fopen(argv[1],"r");      
+       yyout = fopen("code_genere.txt","w");  
+       table_quadruple = malloc(100*sizeof(Quadruple*)); 
 
        /* Creation de la table de hachage */
        table_variable=g_hash_table_new(g_str_hash,
@@ -602,6 +630,8 @@ int main(int argc, char *argv[]){
 
        /* Liberation memoire : suppression de la table */
        /* g_hash_table_destroy(table_variable);*/
+       
+       fclose(yyout);
        return EXIT_SUCCESS;
 }
 

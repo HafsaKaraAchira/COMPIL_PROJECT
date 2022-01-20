@@ -1,7 +1,8 @@
 inicio
 entero i;
 sarta a;
-a <- "haha" ;
 carta b ;
-i <- b ou 7 ;
+i <- 1 ;
+b <- "a" ;
+a <- "test" ;
 finito
