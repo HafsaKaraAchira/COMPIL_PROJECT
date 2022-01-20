@@ -237,8 +237,9 @@ affectation:  identificateur TOK_AFFECT expressionArithmetique TOK_FINSTR{
               identificateur TOK_AFFECT constantChaine TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
                      RoutineAffectation(strdup($1),strdup($3),"sarta");
-              }                            
-              identificateur TOK_AFFECT constantChaine TOK_FINSTR{
+              }           
+              |                 
+              identificateur TOK_AFFECT constantCaractere TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
                      RoutineAffectation(strdup($1),strdup($3),"carta");
               }
