@@ -1,8 +1,8 @@
 inicio
-entero i;
-sarta a;
-carta b ;
-i <- 1 ;
-b <- "a" ;
-a <- "test" ;
+entero a ;
+entero b ;
+tablero t ;
+a <- c+4;
+b<- 3 ;
+t<-[a,b] ;
 finito

@@ -69,41 +69,43 @@ extern int yydebug;
     TOK_PARD = 275,
     NEG = 276,
     TOK_NOMBRE = 277,
-    TOK_STR = 278,
-    TOK_VAR = 279,
-    TOK_CSTB = 280,
-    TOK_VARB = 281,
-    TOK_TYPE = 282,
-    TOK_AFFECT = 283,
-    TOK_OUVR = 284,
-    TOK_FERM = 285,
-    TOK_BRACKG = 286,
-    TOK_BRACKD = 287,
-    TOK_ACCOLG = 288,
-    TOK_ACCOLD = 289,
-    TOK_VIRG = 290,
-    TOK_DPTS = 291,
-    TOK_PIPE = 292,
-    TOK_FINSTR = 293,
-    TOK_FINI = 294,
-    TOK_FINF = 295,
-    TOK_SI = 296,
-    TOK_ALORS = 297,
-    TOK_SINON = 298,
-    TOK_FINSI = 299,
-    TOK_SWITCH = 300,
-    TOK_CASE = 301,
-    TOK_DEFAULT = 302,
-    TOK_CASEDEF = 303,
-    TOK_FINSWITCH = 304,
-    TOK_FOR = 305,
-    TOK_DANS = 306,
-    TOK_FAIRE = 307,
-    TOK_FINFOR = 308,
-    TOK_TANT = 309,
-    TOK_FINT = 310,
-    TOK_LEER = 311,
-    TOK_ESCRIR = 312
+    TOK_FLOAT = 278,
+    TOK_STR = 279,
+    TOK_CHAR = 280,
+    TOK_VAR = 281,
+    TOK_CSTB = 282,
+    TOK_VARB = 283,
+    TOK_TYPE = 284,
+    TOK_AFFECT = 285,
+    TOK_OUVR = 286,
+    TOK_FERM = 287,
+    TOK_BRACKG = 288,
+    TOK_BRACKD = 289,
+    TOK_ACCOLG = 290,
+    TOK_ACCOLD = 291,
+    TOK_VIRG = 292,
+    TOK_DPTS = 293,
+    TOK_PIPE = 294,
+    TOK_FINSTR = 295,
+    TOK_FINI = 296,
+    TOK_FINF = 297,
+    TOK_SI = 298,
+    TOK_ALORS = 299,
+    TOK_SINON = 300,
+    TOK_FINSI = 301,
+    TOK_SWITCH = 302,
+    TOK_CASE = 303,
+    TOK_DEFAULT = 304,
+    TOK_CASEDEF = 305,
+    TOK_FINSWITCH = 306,
+    TOK_FOR = 307,
+    TOK_DANS = 308,
+    TOK_FAIRE = 309,
+    TOK_FINFOR = 310,
+    TOK_TANT = 311,
+    TOK_FINT = 312,
+    TOK_LEER = 313,
+    TOK_ESCRIR = 314
   };
 #endif
 
@@ -111,12 +113,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 50 "analyzer_syn.y"
+#line 56 "analyzer_syn.y"
 
        long nombre;
        char* texte;
 
-#line 120 "analyzer_syn.tab.h"
+#line 122 "analyzer_syn.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

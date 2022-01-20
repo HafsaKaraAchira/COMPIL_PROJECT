@@ -11,6 +11,8 @@ char *buff;
 extern FILE *yyin ;
 extern FILE *yyout ;
 
+char* typeTable = NULL;
+
 GHashTable* table_variable;
 
 typedef struct Variable Variable;
@@ -18,6 +20,7 @@ typedef struct Variable Variable;
 struct Variable{
        char* type;
        void* value;
+
 };
 
 typedef struct Quadruple Quadruple;
@@ -43,6 +46,9 @@ char* getTypeSymbole(char *nom);
 int insertQuadr(char* op,void * arg1 , void * arg2 , char * result);
 Quadruple* getQuadr(int id);
 void writeQuadr(int id,Quadruple * quad);
+
+void RoutineAffectation(char* arg1 ,char* arg2,char* type);
+void RoutineTableau(char* arg1,char* type);
 
 %}
 
@@ -85,7 +91,10 @@ void writeQuadr(int id,Quadruple * quad);
 %type<texte>            variable
 %type<texte>            constant
 %type<texte>            constantArithmetique
+%type<texte>            constantEntier
+%type<texte>            constantReelle
 %type<texte>            constantChaine
+%type<texte>            constantCaractere
 
 %type<texte>            operationBinaire
 
@@ -118,7 +127,9 @@ void writeQuadr(int id,Quadruple * quad);
 /* Nous avons la liste de nos tokens (les terminaux de notre grammaire) */
 
 %token<texte>        TOK_NOMBRE      /*nombre*/
-%token<texte>        TOK_STR         /*variable*/
+%token<texte>        TOK_FLOAT       /*reel*/
+%token<texte>        TOK_STR         /*chaine*/
+%token<texte>        TOK_CHAR         /*caracteres*/
 %token<texte>        TOK_VAR         /*variable*/
 %token<texte>        TOK_CSTB        /*variable_booleeen*/
 %token<texte>        TOK_VARB        /*variable_booleeen*/
@@ -167,14 +178,14 @@ void writeQuadr(int id,Quadruple * quad);
 
 
 script: TOK_FINI code TOK_FINF{
-              printf("\n==================================================================================== Fin du script ====================================================================================\n"); 
+              printf("\n========================================================= Fin du script =========================================================\n"); 
        };
 
 
 code:  %empty{};
        |
        code instruction{
-              printf("\n------------------------------------- Instruction valide ! --------------------------------------\n\n");
+              printf("\n------------------------------------- Instruction valide en syntaxique ! --------------------------------------\n\n");
        }
        |
        code error{
@@ -215,29 +226,28 @@ declaration:  type identificateur TOK_FINSTR{
 
 affectation:  identificateur TOK_AFFECT expressionArithmetique TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur arithmetique ( %s ) sur la variable ( %s )",$3,$1);
-                     setValSymbole(strdup($1),strdup($3),"entero"); 
-                     insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
+                     RoutineAffectation(strdup($1),strdup($3),NULL);
               }
               |
               identificateur TOK_AFFECT expressionBooleenne TOK_FINSTR{
                      printf("\n\tInstruction type Affectation : Affectation de la valeur booleenne ( %s ) sur la variable ( %s )",$3,$1);
-                     setValSymbole(strdup($1),strdup($3),"entero");
-                     insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
+                     RoutineAffectation(strdup($1),strdup($3),"entero");
               }
               |
               identificateur TOK_AFFECT constantChaine TOK_FINSTR{
-                     if(VariableCompatible($1,"sarta")){
-                            printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
-                            setValSymbole(strdup($1),strdup($3),"sarta");
-                            insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
-                     }else{
-                            if(VariableCompatible($1,"carta") && strlen($3)==3){
-                                   printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
-                                   setValSymbole(strdup($1),strdup($3),"carta");
-                                   insertQuadr(strdup("<-"),strdup($3),strdup("_"),strdup($1));
-                            }                                       
-                     }
+                     printf("\n\tInstruction type Affectation : Affectation de la valeur chaine de caracteres ( %s ) sur la variable ( %s )",$3,$1);
+                     RoutineAffectation(strdup($1),strdup($3),"sarta");
+              }                            
+              identificateur TOK_AFFECT constantChaine TOK_FINSTR{
+                     printf("\n\tInstruction type Affectation : Affectation de la valeur du caratere ( %s ) sur la variable ( %s )",$3,$1);
+                     RoutineAffectation(strdup($1),strdup($3),"carta");
               }
+              |
+              identificateur TOK_AFFECT constantTableau TOK_FINSTR{
+                     printf("\n\tInstruction type Affectation : Affectation de la structure tableau ( %s ) sur la variable ( %s )",$3,$1);
+                     RoutineAffectation(strdup($1),strdup($3),"tablero");
+              }
+              
               ;
 
 lecture:      TOK_LEER TOK_PARG identificateur TOK_PARD TOK_FINSTR{
@@ -248,10 +258,22 @@ ecriture:     TOK_ESCRIR TOK_PARG variable TOK_PARD TOK_FINSTR{
                      printf("\n\tInstruction type Ecriture :ecrire la valeur de ( %s )",$3);
               };
                                   
-operationBinaire: variable TOK_DECAL expressionArithmetique TOK_FINSTR{
+operationBinaire: variable TOK_DECAL constantEntier TOK_FINSTR{
                      printf("\n\t\tOperation binaire");
                      $$=strcat(strcat(strdup($1),strdup("DECAL")),strdup($3));
-              };                            
+              }
+              |
+              variable TOK_DECAL identificateur TOK_FINSTR{
+                     printf("\n\t\tOperation binaire");
+                     if(VariableCompatible($3,"entero")){
+                            $$=strcat(strcat(strdup($1),strdup("DECAL")),strdup($3));
+                     }
+                     else{
+                            fprintf(stderr,"\tERREUR : Erreur de semantique , Ligne %d . Type incompatible ( entier attendu - valeur : %s ) !\n",lineno,strdup($3));
+                            error_semantical=true;
+                     }  
+              }
+              ;                            
 
 variable:     identificateur{}
               |
@@ -268,30 +290,66 @@ constant:     constantArithmetique{       $$=strdup($1);}
               |
               constantChaine{       $$=strdup($1);}
               |
+              constantCaractere{    $$=strdup($1);}
+              |
               constantTableau{       $$=strdup($1);}
               ;
 
-constantArithmetique:  TOK_NOMBRE{
-                            printf("\t\tConstant arithmetique : %s",$1);
-                            $$=strdup($1);
-                     };   
+constantArithmetique:  constantEntier{}
+                     |
+                     constantReelle{}
+                     ;   
+
+constantEntier: TOK_NOMBRE{
+                     printf("\t\tConstant arithmetique entier : %s",$1);
+                     $$=strdup($1);
+              };
+
+constantReelle:TOK_FLOAT{
+                     printf("\t\tConstant arithmetique reelle : %s",$1);
+                     $$=strdup($1);
+              }
+              ;                    
+
 
 constantChaine: TOK_STR{
                      printf("\t\tConstant Chaines : %s",$1);
+                     $$=strdup($1);
+              }; 
+
+constantCaractere: TOK_CHAR{
+                     printf("\t\tConstant Caractere : %s",$1);
                      $$=strdup($1);
               };  
 
 constantTableau: TOK_BRACKG elements TOK_BRACKD{
                      $$=strcat(strcat(strdup("["),strdup($2)),strdup("]"));
-                     printf("\t\tConstant tableau : %s",$$);
-              };                 
+                     printf("\t\tConstant tableau de type %s : %s",typeTable,$$);
+              }
+              |
+              TOK_BRACKG TOK_BRACKD{
+                     $$=strcat( strdup("[") , strdup("]") );
+                     printf("\t\tConstant tableau vide : %s",$$);
+              }
+              ;                 
 
-elements: elements TOK_VIRG element{       $$=strcat( strcat( strdup($1) , strdup(",") ) , strdup($3) ) ;}
+elements: elements TOK_VIRG element{ $$=strcat( strcat( strdup($1) , strdup(",") ) , strdup($3) ) ; }
        |
-       element{       $$=strdup($1);}
+       element{ $$=strdup($1); }
        ;
  
-element:variable{};                                                         
+element:identificateur{ RoutineTableau(strdup($1),NULL); }
+       |
+       constantEntier{ RoutineTableau(strdup($1),"entero"); }
+       |
+       constantReelle{ RoutineTableau(strdup($1),"float");  }
+       |
+       constantChaine{ RoutineTableau(strdup($1),"sarta");  }
+       |
+       constantCaractere{ RoutineTableau(strdup($1),"carta"); }
+       |
+       constantTableau{ RoutineTableau(strdup($1),"tablero"); }
+       ;                                                         
 
 expression:   expressionArithmetique{}             
        	|
@@ -312,7 +370,7 @@ expression:   expressionArithmetique{}
 
 expressionArithmetique: 
        identificateur{
-              if(VariableCompatible(strdup($1),"entero")){
+              if(VariableCompatible(strdup($1),"entero")|VariableCompatible(strdup($1),"float")){
                      $$=strdup($1);
               }                     
        }
@@ -502,22 +560,28 @@ void insertSymbole(char *nom,char *type,void *val){
               var->type=type;
               var->value=val;
               if(!g_hash_table_insert(table_variable,nom,var)){
-                     fprintf(stderr,"ERREUR - PROBLEME CREATION VARIABLE !\n");
-                     exit(-1);
+                     fprintf(stderr,"ERREUR - PROBLEME CREATION VARIABLE , LIGNE %d \n",lineno);
+                     /* exit(-1);*/
               }
        }else{
-              fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE !\n");
-              exit(-1);
+              fprintf(stderr,"ERREUR - PROBLEME ALLOCATION MEMOIRE VARIABLE , LIGNE %d \n",lineno);
+              /* exit(-1);*/
        }
 }
 
 bool TypeCompatible(Variable* var,char* type){
-       return (strcmp(var->type,type)==0) ;
+       if( !strcmp(var->type,"float") && !strcmp(type,"entero") ){return true ;}
+       else{return (strcmp(var->type,type)==0) ;}
 }
 
 bool VariableCompatible(char* nom,char* type){
        Variable* var=g_hash_table_lookup(table_variable,nom); 
-       return (TypeCompatible(var,type)) ;
+       if(var!=NULL){ 
+              return (TypeCompatible(var,type)) ;
+       }else{
+              fprintf(stderr,"\tERREUR : Erreur de semantique , Ligne %d . Variable %s jamais declaree !\n",lineno,nom);
+              error_semantical=true;
+       }
 }
 
 void setValSymbole(char* nom,void* val,char* type){
@@ -529,11 +593,11 @@ void setValSymbole(char* nom,void* val,char* type){
                      g_hash_table_replace(table_variable,nom,var) ;  
               }      
               else{
-                     fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Type incompatible ( %s attendu - valeur : %s ) !\n",var->type,(char*)var->value);
+                     fprintf(stderr,"\tERREUR : Erreur de semantique , Ligne %d . Type incompatible ( %s attendu - valeur : %s ) !\n",lineno,var->type,(char*)var->value);
                      error_semantical=true;
               }  
        }else{
-              fprintf(stderr,"\tERREUR : Erreur de semantique a la ligne __. Variable %s jamais declaree !\n",nom);
+              fprintf(stderr,"\tERREUR : Erreur de semantique , Ligne %d . Variable %s jamais declaree !\n",lineno,nom);
               error_semantical=true;
        }
 }
@@ -579,7 +643,6 @@ int insertQuadr(char* op,void * arg1 , void * arg2 , char* result){
               quad->arg1=arg1;
               quad->arg2=arg2;
               quad->result=result;
-              /* printf("\n test \n") ;*/
               table_quadruple[qc] = quad ;
               writeQuadr(qc,quad);
               return qc++;
@@ -597,6 +660,26 @@ void writeQuadr(int id,Quadruple * quad){
 
 Quadruple* getQuadr(int id){
       return (table_quadruple[id]); 
+}
+
+
+/*************/
+
+void RoutineAffectation(char* arg1 ,char* arg2,char* type){
+       setValSymbole( strdup(arg1) , strdup(arg2) , (type==NULL?getTypeSymbole(arg1):type) ); 
+       insertQuadr(strdup("<-"),arg2,strdup("_"),arg1);
+}
+
+void RoutineTableau(char* arg1,char* type){
+       if(typeTable ==NULL){
+              typeTable = (type==NULL?getTypeSymbole(arg1):type);
+       }else{
+              int c = (type==NULL?!VariableCompatible(arg1,typeTable):strcmp("entero",typeTable)) ;
+              if(c){
+                     fprintf(stderr,"\tERREUR : Erreur de semantique , Ligne %d . Type incompatible ( %s attendu - valeur : %s ) !\n",lineno,typeTable,arg1);
+                     error_semantical=true;             
+              }
+       }
 }
 
 int main(int argc, char *argv[]){
@@ -619,22 +702,28 @@ int main(int argc, char *argv[]){
               printf("\t-- Echec a lanalyse lexicale --\n");
        }
        else{
-              printf("\t-- Succes a lanalyse lexicale ! --\n");
+              printf("\t-- Succès a lanalyse lexicale ! --\n");
        }
        if(error_syntaxical){
               printf("\t-- Echec a lanalyse syntaxique --\n");
        }
        else{
-              printf("\t-- Succes a lanalyse syntaxique ! --\n");
+              printf("\t-- Succès a lanalyse syntaxique ! --\n");
+       }
+       if(error_semantical){
+              printf("\t-- Echec a lanalyse sémantique !--\n\n");
+       }
+       else{
+              printf("\t-- Succès a lanalyse sémantique ! --\n\n");
        }
 
        /* Liberation memoire : suppression de la table */
-       /* g_hash_table_destroy(table_variable);*/
+       g_hash_table_destroy(table_variable);
        
        fclose(yyout);
        return EXIT_SUCCESS;
 }
 
 void yyerror(char *s) {
-       fprintf(stderr, "Erreur de syntaxe a la ligne __ : %s\n", s);
+       fprintf(stderr, "Erreur de syntaxe a la ligne %d: %s\n", lineno, s);
 }

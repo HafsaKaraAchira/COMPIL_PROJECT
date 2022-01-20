@@ -2,8 +2,8 @@
 %{
 #include "analyzer.h"
 bool error_lexical=false; 
+unsigned int lineno=1;
 
-char * send_error(char *error ,int line);
 %}
 
 %option stack
@@ -46,7 +46,7 @@ identificateur {lettre}({lettre}|{nombre})*
  /****************************************** Strings ******************************************/
 
 \"				 		{yy_push_state(string); yymore();}
-<string>[^\"]*\" 		{	yy_pop_state(); 
+<string>[^\"]*{2,}\" 		{	yy_pop_state(); 
 							yylval.texte = yytext;
 							if(YY_START == boolean){
 								
@@ -61,7 +61,18 @@ identificateur {lettre}({lettre}|{nombre})*
 																			yylval.texte = (strndup(yytext+1,strlen(yytext)-2)?"vrai":"faux");
 																			if(YY_START != boolean){yy_push_state(boolean);}
 																			return TOK_CSTB ;
-																		}						
+																		}	
+
+\'[^\']\' 		{	
+					yylval.texte = yytext;
+					if(YY_START == boolean){			
+						yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ; 
+						return TOK_CSTB ;
+					}else{
+						yylval.texte = yytext; 
+						return TOK_CHAR ;
+					}
+				}																							
 
  /****************************************** constants ******************************************/
 
@@ -80,6 +91,22 @@ identificateur {lettre}({lettre}|{nombre})*
 																	if(YY_START != boolean){yy_push_state(boolean);}
 																	return TOK_CSTB ;
 																}
+
+{reel} {
+			if(YY_START == boolean){
+				yylval.texte = (atof(yytext)?"vrai":"faux") ; 
+				return TOK_CSTB ;
+			}else{
+				yylval.texte = yytext; 
+				return TOK_FLOAT ;
+			}
+		}		
+
+{reel}/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{ 
+																	yylval.texte = (atof(yytext)?"vrai":"faux") ;
+																	if(YY_START != boolean){yy_push_state(boolean);}
+																	return TOK_CSTB ;
+																}																
 
  /****************************************** block_fonctions ******************************************/
  
@@ -183,19 +210,27 @@ identificateur {lettre}({lettre}|{nombre})*
 
 "**" 						{yy_push_state(comment); yymore();}
 <comment>[^"**"]*("**") 	{yy_pop_state(); }
-<comment>[^"**"]*[^"**"] 	{send_error(yytext,yylineno);}
+<comment>[^"**"]*[^"**"] 	{	
+								fprintf(stderr,"\n\tERREUR : COMMENTAIRE non fermé ligne %d , column __ .\n",lineno);
+        						error_lexical=true;
+        						return yytext[0];
+							}
 !!							{yy_push_state(inlin_comm); yymore();}
 <inlin_comm>.*				{yy_pop_state(); }
 
  /****************************************** blanks ******************************************/
-"\n"
+"\n"	{lineno++;}
 {separateur}	;
 
 
 
  /****************************************** other caracters ******************************************/
  
-. 	{send_error(yytext,yylineno);}
+. 	{
+		fprintf(stderr,"\n\tERREUR LEXICALE : Lexeme inconnu %s , ligne %d , column __ .\n",yytext,lineno);
+        error_lexical=true;
+        return yytext[0];
+	}
 
  /****************************************** EOF ******************************************/
 
