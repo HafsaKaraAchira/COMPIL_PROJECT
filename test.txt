@@ -2,7 +2,6 @@ inicio
 entero a ;
 entero b ;
 tablero t ;
-a <- c+4;
 b<- 3 ;
 t<-[a,b] ;
 finito
