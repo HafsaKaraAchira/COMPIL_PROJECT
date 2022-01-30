@@ -1300,10 +1300,8 @@ case 2:
 YY_RULE_SETUP
 #line 50 "analyzer_lex.l"
 {	yy_pop_state(); 
-							yylval.texte = yytext;
 							if(YY_START == boolean){
-								
-								yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ; 
+								yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ;
 								return TOK_CSTB ;
 							}else{
 								yylval.texte = yytext; 
@@ -1314,7 +1312,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 61 "analyzer_lex.l"
+#line 60 "analyzer_lex.l"
 {	yy_pop_state(); 
 																			yylval.texte = (strndup(yytext+1,strlen(yytext)-2)?"vrai":"faux");
 																			if(YY_START != boolean){yy_push_state(boolean);}
@@ -1324,7 +1322,7 @@ YY_RULE_SETUP
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 67 "analyzer_lex.l"
+#line 66 "analyzer_lex.l"
 {	
 					yylval.texte = yytext;
 					if(YY_START == boolean){			
@@ -1339,7 +1337,7 @@ YY_RULE_SETUP
 /****************************************** constants ******************************************/
 case 5:
 YY_RULE_SETUP
-#line 80 "analyzer_lex.l"
+#line 79 "analyzer_lex.l"
 {
 			if(YY_START == boolean){
 				yylval.texte = (atoi(yytext)?"vrai":"faux") ; 
@@ -1352,7 +1350,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 90 "analyzer_lex.l"
+#line 89 "analyzer_lex.l"
 { 
 																	yylval.texte = (atoi(yytext)?"vrai":"faux") ;
 																	if(YY_START != boolean){yy_push_state(boolean);}
@@ -1361,7 +1359,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 96 "analyzer_lex.l"
+#line 95 "analyzer_lex.l"
 {
 			if(YY_START == boolean){
 				yylval.texte = (atof(yytext)?"vrai":"faux") ; 
@@ -1374,7 +1372,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 106 "analyzer_lex.l"
+#line 105 "analyzer_lex.l"
 { 
 																	yylval.texte = (atof(yytext)?"vrai":"faux") ;
 																	if(YY_START != boolean){yy_push_state(boolean);}
@@ -1389,100 +1387,100 @@ YY_LINENO_REWIND_TO(yy_bp + 6);
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 114 "analyzer_lex.l"
+#line 113 "analyzer_lex.l"
 { return TOK_FINI ; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 115 "analyzer_lex.l"
+#line 114 "analyzer_lex.l"
 { return TOK_FINF ; }
 	YY_BREAK
 /****************************************** types ******************************************/
 case 11:
 YY_RULE_SETUP
-#line 119 "analyzer_lex.l"
+#line 118 "analyzer_lex.l"
 { yylval.texte = yytext; return TOK_TYPE ; }
 	YY_BREAK
 /****************************************** conditions ******************************************/
 case 12:
 YY_RULE_SETUP
-#line 123 "analyzer_lex.l"
+#line 122 "analyzer_lex.l"
 {yy_push_state(if_block); yy_push_state(boolean); return TOK_SI ; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 124 "analyzer_lex.l"
+#line 123 "analyzer_lex.l"
 {yy_pop_state(); return TOK_ALORS ; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 125 "analyzer_lex.l"
+#line 124 "analyzer_lex.l"
 {return TOK_SINON ;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 126 "analyzer_lex.l"
+#line 125 "analyzer_lex.l"
 {yy_pop_state(); return TOK_FINSI ; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 128 "analyzer_lex.l"
+#line 127 "analyzer_lex.l"
 {yy_push_state(matching); return TOK_SWITCH ;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 129 "analyzer_lex.l"
+#line 128 "analyzer_lex.l"
 {yy_push_state(case_block);  return TOK_CASE ;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 130 "analyzer_lex.l"
+#line 129 "analyzer_lex.l"
 {yy_push_state(case_block);  return TOK_DEFAULT ;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 131 "analyzer_lex.l"
+#line 130 "analyzer_lex.l"
 {yy_pop_state(); return TOK_CASEDEF ;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 132 "analyzer_lex.l"
+#line 131 "analyzer_lex.l"
 {yy_pop_state(); return TOK_FINSWITCH ;}
 	YY_BREAK
 /****************************************** boucles ******************************************/
 case 21:
 YY_RULE_SETUP
-#line 136 "analyzer_lex.l"
+#line 135 "analyzer_lex.l"
 { yy_push_state(for_block); return TOK_FOR ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 137 "analyzer_lex.l"
+#line 136 "analyzer_lex.l"
 {return TOK_DANS ;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 138 "analyzer_lex.l"
+#line 137 "analyzer_lex.l"
 {return TOK_FAIRE ;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 139 "analyzer_lex.l"
+#line 138 "analyzer_lex.l"
 {yy_pop_state(); return TOK_FINFOR ;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 141 "analyzer_lex.l"
+#line 140 "analyzer_lex.l"
 {yy_push_state(while_block); yy_push_state(boolean); return TOK_TANT ;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 142 "analyzer_lex.l"
+#line 141 "analyzer_lex.l"
 {yy_pop_state(); return TOK_FAIRE ;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 143 "analyzer_lex.l"
+#line 142 "analyzer_lex.l"
 {yy_pop_state(); return TOK_FINT ;}
 	YY_BREAK
 /****************************************** E/S ******************************************/
@@ -1491,7 +1489,7 @@ case 28:
 (yy_c_buf_p) = yy_cp = yy_bp + 4;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 147 "analyzer_lex.l"
+#line 146 "analyzer_lex.l"
 {return TOK_LEER ;}
 	YY_BREAK
 case 29:
@@ -1499,60 +1497,60 @@ case 29:
 (yy_c_buf_p) = yy_cp = yy_bp + 6;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 148 "analyzer_lex.l"
+#line 147 "analyzer_lex.l"
 {return TOK_ESCRIR ;}
 	YY_BREAK
 /****************************************** operateurs arithmetiques ******************************************/
 case 30:
 YY_RULE_SETUP
-#line 152 "analyzer_lex.l"
+#line 151 "analyzer_lex.l"
 {return TOK_PLUS ; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 153 "analyzer_lex.l"
+#line 152 "analyzer_lex.l"
 {return TOK_MOINS ;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 154 "analyzer_lex.l"
+#line 153 "analyzer_lex.l"
 {return TOK_MUL ;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 155 "analyzer_lex.l"
+#line 154 "analyzer_lex.l"
 {return TOK_DIV ;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 156 "analyzer_lex.l"
+#line 155 "analyzer_lex.l"
 {return TOK_MOD ;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 157 "analyzer_lex.l"
+#line 156 "analyzer_lex.l"
 {return TOK_PUISS ;}
 	YY_BREAK
 /****************************************** operateurs logiques ******************************************/
 case 36:
 YY_RULE_SETUP
-#line 161 "analyzer_lex.l"
+#line 160 "analyzer_lex.l"
 { if(YY_START != boolean){yy_push_state(boolean);} return TOK_NON ;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 162 "analyzer_lex.l"
+#line 161 "analyzer_lex.l"
 {return TOK_ET ;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 163 "analyzer_lex.l"
+#line 162 "analyzer_lex.l"
 {return TOK_OU ;}
 	YY_BREAK
 /****************************************** operateurs logiques ******************************************/
 case 39:
 YY_RULE_SETUP
-#line 167 "analyzer_lex.l"
+#line 166 "analyzer_lex.l"
 { return TOK_AFFECT ;}
 	YY_BREAK
 /****************************************** operateurs comparaison ******************************************/
@@ -1561,7 +1559,7 @@ case 40:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 171 "analyzer_lex.l"
+#line 170 "analyzer_lex.l"
 {return TOK_EQ ;}
 	YY_BREAK
 case 41:
@@ -1569,7 +1567,7 @@ case 41:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 172 "analyzer_lex.l"
+#line 171 "analyzer_lex.l"
 {return TOK_NQ ;}
 	YY_BREAK
 case 42:
@@ -1577,7 +1575,7 @@ case 42:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 173 "analyzer_lex.l"
+#line 172 "analyzer_lex.l"
 {return TOK_LT ;}
 	YY_BREAK
 case 43:
@@ -1585,7 +1583,7 @@ case 43:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 174 "analyzer_lex.l"
+#line 173 "analyzer_lex.l"
 {return TOK_GT ;}
 	YY_BREAK
 case 44:
@@ -1593,7 +1591,7 @@ case 44:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 175 "analyzer_lex.l"
+#line 174 "analyzer_lex.l"
 {return TOK_LE ;}
 	YY_BREAK
 case 45:
@@ -1601,75 +1599,75 @@ case 45:
 (yy_c_buf_p) = yy_cp = yy_bp + 2;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 176 "analyzer_lex.l"
+#line 175 "analyzer_lex.l"
 {return TOK_GE ;}
 	YY_BREAK
 /****************************************** operateurs decalage ******************************************/
 case 46:
 YY_RULE_SETUP
-#line 180 "analyzer_lex.l"
+#line 179 "analyzer_lex.l"
 {return TOK_DECAL ;}
 	YY_BREAK
 /****************************************** ponctuation ******************************************/	
 /*{reel} {yylval.decimal=atof(yytext);	return TOK_NOMBRE;}*/
 case 47:
 YY_RULE_SETUP
-#line 185 "analyzer_lex.l"
+#line 184 "analyzer_lex.l"
 {return TOK_PARG ;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 186 "analyzer_lex.l"
+#line 185 "analyzer_lex.l"
 {return TOK_PARD ;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 188 "analyzer_lex.l"
+#line 187 "analyzer_lex.l"
 {return TOK_ACCOLG ;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 189 "analyzer_lex.l"
+#line 188 "analyzer_lex.l"
 {return TOK_BRACKG ;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 190 "analyzer_lex.l"
+#line 189 "analyzer_lex.l"
 {return TOK_OUVR ;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 192 "analyzer_lex.l"
+#line 191 "analyzer_lex.l"
 {return TOK_ACCOLD ;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 193 "analyzer_lex.l"
+#line 192 "analyzer_lex.l"
 {return TOK_BRACKD ;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 194 "analyzer_lex.l"
+#line 193 "analyzer_lex.l"
 {return TOK_FERM ;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 196 "analyzer_lex.l"
+#line 195 "analyzer_lex.l"
 {return TOK_VIRG ;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 197 "analyzer_lex.l"
+#line 196 "analyzer_lex.l"
 {return TOK_PIPE ;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 198 "analyzer_lex.l"
+#line 197 "analyzer_lex.l"
 {return TOK_DPTS ;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 200 "analyzer_lex.l"
+#line 199 "analyzer_lex.l"
 { 	if(YY_START == boolean) { yy_pop_state(); }
 			return TOK_FINSTR ;
 		}
@@ -1677,30 +1675,30 @@ YY_RULE_SETUP
 /****************************************** identificateurs ******************************************/
 case 59:
 YY_RULE_SETUP
-#line 206 "analyzer_lex.l"
+#line 205 "analyzer_lex.l"
 { if(YY_START != boolean){yy_push_state(boolean);} yylval.texte = yytext; return TOK_VARB ;}				
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 207 "analyzer_lex.l"
+#line 206 "analyzer_lex.l"
 {	yylval.texte = yytext; return (YY_START == boolean?TOK_VARB:TOK_VAR) ;}
 	YY_BREAK
 /****************************************** commentaires ******************************************/
 case 61:
 YY_RULE_SETUP
-#line 212 "analyzer_lex.l"
+#line 211 "analyzer_lex.l"
 {yy_push_state(comment); yymore();}
 	YY_BREAK
 case 62:
 /* rule 62 can match eol */
 YY_RULE_SETUP
-#line 213 "analyzer_lex.l"
+#line 212 "analyzer_lex.l"
 {yy_pop_state(); }
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 214 "analyzer_lex.l"
+#line 213 "analyzer_lex.l"
 {	
 								fprintf(stderr,"\n\tERREUR : COMMENTAIRE non fermé ligne %d , column __ .\n",lineno);
         						error_lexical=true;
@@ -1709,12 +1707,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 219 "analyzer_lex.l"
+#line 218 "analyzer_lex.l"
 {yy_push_state(inlin_comm); yymore();}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 220 "analyzer_lex.l"
+#line 219 "analyzer_lex.l"
 {yy_pop_state(); }
 	YY_BREAK
 /****************************************** blanks ******************************************/
@@ -1733,11 +1731,10 @@ YY_RULE_SETUP
 /****************************************** other caracters ******************************************/
 case 68:
 YY_RULE_SETUP
-#line 230 "analyzer_lex.l"
+#line 228 "analyzer_lex.l"
 {
-		fprintf(stderr,"\n\tERREUR LEXICALE : Lexeme inconnu %s , ligne %d , column __ .\n",yytext,lineno);
+		fprintf(stderr,"\n\tERREUR LEXICALE : Lexeme inconnu %s , ligne %d .\n",yytext,lineno);
         error_lexical=true;
-        return yytext[0];
 	}
 	YY_BREAK
 /****************************************** EOF ******************************************/
@@ -1753,15 +1750,15 @@ case YY_STATE_EOF(for_block):
 case YY_STATE_EOF(while_block):
 case YY_STATE_EOF(matching):
 case YY_STATE_EOF(case_block):
-#line 238 "analyzer_lex.l"
+#line 235 "analyzer_lex.l"
 { return 0; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 240 "analyzer_lex.l"
+#line 237 "analyzer_lex.l"
 ECHO;
 	YY_BREAK
-#line 1765 "lex.yy.c"
+#line 1762 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2795,7 +2792,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 240 "analyzer_lex.l"
+#line 237 "analyzer_lex.l"
 
 
 /****************************************** Code Section ******************************************/

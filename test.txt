@@ -1,7 +1,59 @@
 inicio
-entero a ;
-entero b ;
+
+sarta chaine;
+entero i;
+entero a;
+entero b;
+float fl;
+tablero table;
 tablero t ;
-b<- 3 ;
+
+b<-3 ;
+i<-0;
+a<-2;
+table <- [0,10];
+
+por i en table darse
+    
+    b<- 5*a+b;
+
+finitopor
+
+si i gt 10 ento
+  i<-5;
+contrario
+  i<--2;
+finitosi
+
+!! initialisation de la chaine
+
+cambiar (b)
+caso 1 *
+chaine <-"hi";
+caso 103 *
+chaine <-"hello";
+
+defecto *
+chaine <-"world";
+finitocambiar
+
+
+Leer(fl);
+
+tanto chaine eq "hello"  darse
+fl<-fl/2+5;
+chaine DD 2 ;
+finitotanto
+
+escrir (fl) ;
+
+**
+Ceci est un commentaire
+écrit sur plusieurs lignes
+**
+
 t<-[a,b] ;
+
+
+
 finito
