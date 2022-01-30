@@ -46,17 +46,16 @@ identificateur {lettre}({lettre}|{nombre})*
  /****************************************** Strings ******************************************/
 
 \"				 		{yy_push_state(string); yymore();}
-<string>[^\"]*{2,}\" 		{	yy_pop_state(); 
-							yylval.texte = yytext;
+<string>[^\"]*\" 		{	yy_pop_state(); 
 							if(YY_START == boolean){
-								
-								yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ; 
+								yylval.texte = (strndup(yytext+1,strlen(yytext)-1)?"vrai":"faux") ;
 								return TOK_CSTB ;
 							}else{
 								yylval.texte = yytext; 
 								return TOK_STR ;
 							}
 						}
+						
 <string>[^\"]*\"/{blanc}+(?i:"eq"|"nq"|"lt"|"gt"|"le"|"ge"|"et"|"ou") 	{	yy_pop_state(); 
 																			yylval.texte = (strndup(yytext+1,strlen(yytext)-2)?"vrai":"faux");
 																			if(YY_START != boolean){yy_push_state(boolean);}
@@ -219,17 +218,15 @@ identificateur {lettre}({lettre}|{nombre})*
 <inlin_comm>.*				{yy_pop_state(); }
 
  /****************************************** blanks ******************************************/
+
 "\n"	{lineno++;}
-{separateur}	;
-
-
+{separateur}    ;
 
  /****************************************** other caracters ******************************************/
  
 . 	{
-		fprintf(stderr,"\n\tERREUR LEXICALE : Lexeme inconnu %s , ligne %d , column __ .\n",yytext,lineno);
+		fprintf(stderr,"\n\tERREUR LEXICALE : Lexeme inconnu %s , ligne %d .\n",yytext,lineno);
         error_lexical=true;
-        return yytext[0];
 	}
 
  /****************************************** EOF ******************************************/

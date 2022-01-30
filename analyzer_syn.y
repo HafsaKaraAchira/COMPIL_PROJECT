@@ -181,7 +181,6 @@ script: TOK_FINI code TOK_FINF{
               printf("\n========================================================= Fin du script =========================================================\n"); 
        };
 
-
 code:  %empty{};
        |
        code instruction{
@@ -686,7 +685,7 @@ void RoutineTableau(char* arg1,char* type){
 int main(int argc, char *argv[]){
  	yyin = fopen(argv[1],"r");      
        yyout = fopen("code_genere.txt","w");  
-       table_quadruple = malloc(100*sizeof(Quadruple*)); 
+       table_quadruple = malloc(100*sizeof(Quadruple*));
 
        /* Creation de la table de hachage */
        table_variable=g_hash_table_new(g_str_hash,
